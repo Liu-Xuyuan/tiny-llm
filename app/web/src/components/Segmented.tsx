@@ -1,4 +1,4 @@
-// iOS / macOS 风格分段选择器：浅灰胶囊底座 + 纯净悬浮滑块平滑过渡
+// Liquid Glass 分段选择器：液态玻璃凹槽 + 晶莹镜面高光水滴滑块
 import { useLayoutEffect, useRef, useState, type ReactNode } from "react"
 
 import { cn } from "@/lib/utils"
@@ -23,15 +23,15 @@ export function Segmented<T extends string>({ options, value, onChange, classNam
   }, [value, options])
 
   return (
-    <div className={cn("bg-field relative inline-flex rounded-full p-[3px]", className)}>
+    <div className={cn("liquid-well relative inline-flex rounded-full p-[3px]", className)}>
       <span
         aria-hidden
-        className="bg-surface absolute inset-y-[3px] rounded-full shadow-[0_1px_3px_rgba(0,0,0,0.12),0_0_0_0.5px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_4px_rgba(0,0,0,0.45)]"
+        className="liquid-pill absolute inset-y-[3px] rounded-full"
         style={{
           left: thumb.left,
           width: thumb.width,
           opacity: thumb.visible ? 1 : 0,
-          transition: "left 260ms var(--ease-out-strong), width 260ms var(--ease-out-strong), opacity 150ms",
+          transition: "left 300ms var(--ease-out-strong), width 300ms var(--ease-out-strong), opacity 150ms",
         }}
       />
       {options.map((o, i) => (

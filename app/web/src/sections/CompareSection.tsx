@@ -4,6 +4,7 @@ import { Check, ChevronDown, ChevronLeft, ChevronRight, Copy, SlidersHorizontal 
 
 import { api, fmtM, type CompareModel, type SamplingParams } from "@/lib/api"
 import { getModelBadge } from "@/lib/meta"
+import { onLiquidMove } from "@/lib/motion"
 import { runInto } from "@/lib/run"
 import { resolveSeed } from "@/lib/seed"
 import { Composer } from "@/components/Composer"
@@ -192,7 +193,7 @@ export function CompareSection({ index, examples }: { index: number; examples: s
         />
 
         {/* 可展开采样参数面板 */}
-        <div className="bg-surface-alt rounded-[18px] transition-colors">
+        <div onPointerMove={onLiquidMove} className="apple-card rounded-[20px]">
           <button
             onClick={() => setShowParams((s) => !s)}
             className="text-ink-2 hover:text-ink flex w-full items-center gap-2.5 px-5 py-3.5 text-[13px] transition-colors"
@@ -217,7 +218,7 @@ export function CompareSection({ index, examples }: { index: number; examples: s
         {/* 模型选择器栏 */}
         {models.length > 0 && (
           <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-            <div className="bg-field inline-flex flex-wrap items-center gap-1 rounded-full p-1">
+            <div className="liquid-well inline-flex flex-wrap items-center gap-1 rounded-full p-1">
               {models.map((m, i) => {
                 const out = outs[i] ?? EMPTY_OUTPUT
                 const badge = getModelBadge(m.run)
@@ -229,9 +230,7 @@ export function CompareSection({ index, examples }: { index: number; examples: s
                     onClick={() => selectCard(i)}
                     className={cn(
                       "flex items-center gap-2 rounded-full px-4 py-1.5 text-[13px] transition-all duration-200",
-                      isActive
-                        ? "bg-surface text-ink font-semibold shadow-[0_1px_4px_rgba(0,0,0,0.1)] dark:shadow-[0_1px_6px_rgba(0,0,0,0.5)]"
-                        : "text-ink-3 hover:text-ink",
+                      isActive ? "liquid-pill text-ink font-semibold" : "text-ink-3 hover:text-ink",
                     )}
                   >
                     <span className={cn("size-2 rounded-full", badge.dot, out.running && "animate-pulse")} />
@@ -250,7 +249,7 @@ export function CompareSection({ index, examples }: { index: number; examples: s
                   type="button"
                   aria-label="上一个模型"
                   onClick={() => selectCard((activeIdx - 1 + models.length) % models.length)}
-                  className="bg-field text-ink-2 hover:bg-hover hover:text-ink flex size-8 items-center justify-center rounded-full transition-all active:scale-95"
+                  className="liquid-pill text-ink-2 hover:text-ink flex size-8 items-center justify-center rounded-full transition-all hover:scale-105 active:scale-95"
                 >
                   <ChevronLeft className="size-4" />
                 </button>
@@ -258,7 +257,7 @@ export function CompareSection({ index, examples }: { index: number; examples: s
                   type="button"
                   aria-label="下一个模型"
                   onClick={() => selectCard((activeIdx + 1) % models.length)}
-                  className="bg-field text-ink-2 hover:bg-hover hover:text-ink flex size-8 items-center justify-center rounded-full transition-all active:scale-95"
+                  className="liquid-pill text-ink-2 hover:text-ink flex size-8 items-center justify-center rounded-full transition-all hover:scale-105 active:scale-95"
                 >
                   <ChevronRight className="size-4" />
                 </button>
@@ -296,6 +295,7 @@ export function CompareSection({ index, examples }: { index: number; examples: s
                   tabIndex={isFront ? undefined : 0}
                   onMouseEnter={() => { if (!isFront) setHoveredIdx(i) }}
                   onMouseLeave={() => { if (hoveredIdx === i) setHoveredIdx(null) }}
+                  onPointerMove={isFront ? onLiquidMove : undefined}
                   onClick={() => { if (!isFront) selectCard(i) }}
                   onKeyDown={(e) => {
                     if (!isFront && (e.key === "Enter" || e.key === " ")) {
@@ -317,10 +317,10 @@ export function CompareSection({ index, examples }: { index: number; examples: s
                     ].join(", "),
                   }}
                   className={cn(
-                    "absolute inset-x-0 top-0 origin-top overflow-hidden rounded-[24px] will-change-transform",
+                    "apple-card absolute inset-x-0 top-0 origin-top overflow-hidden rounded-[24px] will-change-transform",
                     isFront
-                      ? cn("apple-card ring-1 ring-black/[0.06] dark:ring-white/[0.1]", out.running && "apple-generating")
-                      : "bg-surface-alt cursor-pointer shadow-[0_2px_14px_rgba(0,0,0,0.06)] ring-1 ring-black/[0.07] dark:bg-[#18181b] dark:shadow-[0_6px_24px_rgba(0,0,0,0.5)] dark:ring-white/[0.1]",
+                      ? cn(out.running && "apple-generating")
+                      : "cursor-pointer",
                   )}
                 >
                   {/* 内部自然高度容器：供 ResizeObserver 精准测量完整内容高度 */}
@@ -391,7 +391,7 @@ export function CompareSection({ index, examples }: { index: number; examples: s
 
         {/* 本次实测推理吞吐横向对比条：点击某一行联动把对应卡片丝滑抽至最前 */}
         {speedRows.length >= 2 && (
-          <div className="bg-surface-alt mx-auto max-w-[920px] rounded-[22px] p-6 sm:p-7" style={{ animation: "fade-up 420ms var(--ease-out-strong) both" }}>
+          <div onPointerMove={onLiquidMove} className="apple-card mx-auto max-w-[920px] rounded-[24px] p-6 sm:p-7" style={{ animation: "fade-up 420ms var(--ease-out-strong) both" }}>
             <div className="mb-5 flex items-center justify-between">
               <span className="text-ink text-[15px] font-semibold tracking-[-0.015em]">本次推理吞吐对比</span>
               <span className="text-ink-3 text-[12px]">点击任意条目切换卡片</span>

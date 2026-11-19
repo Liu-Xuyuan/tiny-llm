@@ -115,23 +115,11 @@ export function IntroSplash({ onDone }: { onDone: () => void }) {
         exiting ? "pointer-events-none scale-[1.015] opacity-0" : "opacity-100",
       )}
     >
-      {/* 极其克制的缓慢漂移氛围光晕，增加 Apple Keynote 景深 */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div
-          className="ambient-orb absolute top-[14%] left-[20%] h-[360px] w-[440px] rounded-full blur-[120px]"
-          style={{ background: "var(--ambient-1)" }}
-        />
-        <div
-          className="ambient-orb-delayed absolute right-[18%] bottom-[16%] h-[320px] w-[400px] rounded-full blur-[120px]"
-          style={{ background: "var(--ambient-2)" }}
-        />
-      </div>
-
-      {/* 右上角极轻的跳过文字链接 */}
+      {/* 右上角液态玻璃跳过胶囊 */}
       <button
         type="button"
         onClick={dismiss}
-        className="text-ink-3 hover:text-ink fixed top-6 right-7 z-10 text-[13px] font-medium transition-colors"
+        className="liquid-pill text-ink-2 hover:text-ink fixed top-6 right-7 z-10 rounded-full px-4 py-1.5 text-[12.5px] font-medium transition-all hover:scale-105 active:scale-95"
       >
         跳过
       </button>

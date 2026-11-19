@@ -6,6 +6,7 @@ import remarkGfm from "remark-gfm"
 
 import { api, type ResultTable } from "@/lib/api"
 import { getFigureMeta } from "@/lib/meta"
+import { onLiquidMove } from "@/lib/motion"
 import { Section } from "@/components/Section"
 import { Segmented } from "@/components/Segmented"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
@@ -53,7 +54,7 @@ export function CurveSection({ index }: { index: number }) {
         </div>
       }
     >
-      <div className="apple-card overflow-hidden rounded-[24px] p-4 sm:p-6">
+      <div onPointerMove={onLiquidMove} className="apple-card overflow-hidden rounded-[24px] p-4 sm:p-6">
         <div className={cn("overflow-hidden rounded-[16px] transition-colors duration-200", adaptDark ? "bg-white dark:bg-[#141416]" : "bg-white")}>
           {run && (
             <img
@@ -104,8 +105,9 @@ export function FiguresSection({ index }: { index: number }) {
             <button
               key={f}
               type="button"
+              onPointerMove={onLiquidMove}
               onClick={() => setActiveIdx(i)}
-              className="apple-card-hover bg-surface-alt group overflow-hidden rounded-[22px] text-left transition-all duration-300 ease-[var(--ease-out-strong)] active:scale-[0.985] dark:bg-surface"
+              className="apple-card apple-card-hover group overflow-hidden rounded-[22px] text-left transition-all duration-300 ease-[var(--ease-out-strong)] active:scale-[0.985]"
               style={{ animation: "fade-up 580ms var(--ease-out-strong) both", animationDelay: `${i * 65}ms` }}
             >
               <div className={cn("overflow-hidden p-3.5 transition-colors", adaptDark ? "bg-white dark:bg-[#141416]" : "bg-white")}>
@@ -127,9 +129,9 @@ export function FiguresSection({ index }: { index: number }) {
         })}
       </div>
 
-      {/* Apple 极简全屏灯箱 */}
+      {/* Apple Liquid Glass 全屏灯箱 */}
       <Dialog open={activeIdx !== null} onOpenChange={(open) => { if (!open) setActiveIdx(null) }}>
-        <DialogContent className="shadow-overlay rounded-[24px] border-0 p-6 sm:max-w-4xl sm:p-7">
+        <DialogContent className="liquid-modal rounded-[26px] border-0 p-6 sm:max-w-4xl sm:p-7">
           {activeFile && activeMeta && activeIdx !== null && (
             <>
               <div className="flex flex-wrap items-center justify-between gap-2 pr-8">
@@ -139,7 +141,7 @@ export function FiguresSection({ index }: { index: number }) {
                 </div>
                 <div className="flex items-center gap-2.5">
                   <ChartModeToggle adaptDark={adaptDark} onToggle={() => setAdaptDark((v) => !v)} />
-                  <span className="bg-field text-ink-2 rounded-full px-3 py-1 font-mono text-[12px] tabular-nums">
+                  <span className="liquid-pill text-ink-2 rounded-full px-3 py-1 font-mono text-[12px] tabular-nums">
                     {activeIdx + 1} / {figures.length}
                   </span>
                 </div>
@@ -157,7 +159,7 @@ export function FiguresSection({ index }: { index: number }) {
                       type="button"
                       aria-label="上一张"
                       onClick={() => setActiveIdx((activeIdx - 1 + figures.length) % figures.length)}
-                      className="apple-nav text-ink hover:text-brand absolute top-1/2 left-2.5 flex size-9 -translate-y-1/2 items-center justify-center rounded-full shadow-md transition-transform hover:scale-105 active:scale-95"
+                      className="liquid-pill text-ink hover:text-brand absolute top-1/2 left-2.5 flex size-9 -translate-y-1/2 items-center justify-center rounded-full transition-transform hover:scale-105 active:scale-95"
                     >
                       <ChevronLeft className="size-4.5" />
                     </button>
@@ -165,7 +167,7 @@ export function FiguresSection({ index }: { index: number }) {
                       type="button"
                       aria-label="下一张"
                       onClick={() => setActiveIdx((activeIdx + 1) % figures.length)}
-                      className="apple-nav text-ink hover:text-brand absolute top-1/2 right-2.5 flex size-9 -translate-y-1/2 items-center justify-center rounded-full shadow-md transition-transform hover:scale-105 active:scale-95"
+                      className="liquid-pill text-ink hover:text-brand absolute top-1/2 right-2.5 flex size-9 -translate-y-1/2 items-center justify-center rounded-full transition-transform hover:scale-105 active:scale-95"
                     >
                       <ChevronRight className="size-4.5" />
                     </button>
@@ -188,7 +190,7 @@ export function ResultsSection({ index }: { index: number }) {
     <Section id="results" index={index} title="结果表" desc="实验 A（模型规模对比）与实验 C（字符级 vs BPE 分词）的完整评测数据。">
       <div className="space-y-6">
         {tables.map((t) => (
-          <div key={t.title} className="apple-card overflow-hidden rounded-[22px] p-6 sm:p-7">
+          <div key={t.title} onPointerMove={onLiquidMove} className="apple-card overflow-hidden rounded-[22px] p-6 sm:p-7">
             <h3 className="text-ink mb-4 text-[17px] font-semibold tracking-[-0.015em]">{t.title}</h3>
             <div className="md-table overflow-x-auto">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>{t.markdown}</ReactMarkdown>

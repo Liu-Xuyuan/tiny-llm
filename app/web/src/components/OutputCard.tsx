@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import { Check, Copy } from "lucide-react"
 
 import type { GenDone } from "@/lib/api"
+import { onLiquidMove } from "@/lib/motion"
 import { PixelLoader } from "@/components/PixelLoader"
 import { cn } from "@/lib/utils"
 
@@ -44,6 +45,7 @@ export function OutputCard({
 
   return (
     <div
+      onPointerMove={onLiquidMove}
       className={cn(
         "apple-card group/out relative flex min-h-56 flex-col overflow-hidden rounded-[22px] p-6 transition-shadow duration-500 sm:p-7",
         out.running && "apple-generating",
@@ -69,7 +71,7 @@ export function OutputCard({
                 "absolute top-5 right-5 flex h-7.5 items-center gap-1.5 rounded-full px-3 text-[12px] font-medium transition-all duration-150",
                 copied
                   ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 opacity-100"
-                  : "bg-field text-ink-2 hover:bg-hover hover:text-ink opacity-75 group-hover/out:opacity-100",
+                  : "liquid-pill text-ink-2 hover:text-ink opacity-80 group-hover/out:opacity-100",
               )}
             >
               {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}

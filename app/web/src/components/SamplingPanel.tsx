@@ -61,7 +61,7 @@ export function SamplingPanel({ value, onChange }: { value: SamplingParams; onCh
 
       <div className="border-line flex items-center justify-between gap-3 border-t pt-4 text-[13px]">
         <span className="text-ink-2 font-medium">Seed</span>
-        <div className="bg-field flex h-8 items-center rounded-full pl-3.5 pr-1">
+        <div className="liquid-well flex h-8 items-center rounded-full pl-3.5 pr-1">
           <input
             type="number"
             value={value.seed}

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react"
 import { RotateCw } from "lucide-react"
 
 import { api, type Checkpoints, type ModelStats as Stats, type SamplingParams } from "@/lib/api"
+import { onLiquidMove } from "@/lib/motion"
 import { runInto } from "@/lib/run"
 import { Composer } from "@/components/Composer"
 import { ModelStats } from "@/components/ModelStats"
@@ -36,7 +37,7 @@ export function GenerateSection({ index, ckpts, reload }: { index: number; ckpts
         <ModelStats stats={stats} />
 
         <div className="grid gap-5 lg:grid-cols-[300px_minmax(0,1fr)]">
-          <div className="apple-card h-fit space-y-6 rounded-[22px] p-6">
+          <div onPointerMove={onLiquidMove} className="apple-card h-fit space-y-6 rounded-[22px] p-6">
             <div className="space-y-2.5">
               <div className="flex items-center justify-between">
                 <span className="text-ink text-[13px] font-semibold">模型权重</span>
@@ -49,7 +50,7 @@ export function GenerateSection({ index, ckpts, reload }: { index: number; ckpts
                 </button>
               </div>
               <Select value={ckpt} onValueChange={setCkpt}>
-                <SelectTrigger size="sm" className="bg-field h-9 w-full rounded-xl border-0 px-3 font-mono text-[12px] shadow-none">
+                <SelectTrigger size="sm" className="liquid-well h-9 w-full rounded-xl border-0 px-3 font-mono text-[12px] shadow-none">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

@@ -1,5 +1,6 @@
 // 模型核心规格条（Apple Tech Specs 大数字风格）：切换模型时五格数字依次错峰弹性翻新
 import { fmtM, type ModelStats as Stats } from "@/lib/api"
+import { onLiquidMove } from "@/lib/motion"
 import { Skeleton } from "@/components/ui/skeleton"
 
 export function ModelStats({ stats }: { stats: Stats | null }) {
@@ -14,7 +15,10 @@ export function ModelStats({ stats }: { stats: Stats | null }) {
     : []
 
   return (
-    <div className="apple-card divide-line grid grid-cols-2 divide-x divide-y overflow-hidden rounded-[22px] sm:grid-cols-5 sm:divide-y-0">
+    <div
+      onPointerMove={onLiquidMove}
+      className="apple-card divide-line grid grid-cols-2 divide-x divide-y overflow-hidden rounded-[22px] sm:grid-cols-5 sm:divide-y-0"
+    >
       {stats
         ? items.map(([k, v, sub], idx) => (
             <div

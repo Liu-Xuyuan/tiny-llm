@@ -1,4 +1,4 @@
-// Apple 产品页风格章节容器：交替纯白 / 浅灰全幅背景 + 滚动视口错峰淡入上浮
+// 章节容器：极轻透的半透明层次交替铺陈，让底层液态光场自然透过每张液态玻璃卡片，并随滚动错峰淡入上浮
 import type { ReactNode } from "react"
 
 import { useInView } from "@/lib/motion"
@@ -24,8 +24,8 @@ export function Section({ id, index, title, desc, aside, children, tinted, surfa
       ref={ref}
       id={id}
       className={cn(
-        "scroll-mt-14 py-16 transition-colors duration-300 sm:py-24",
-        useTinted ? "bg-surface-alt" : "bg-page",
+        "scroll-mt-20 py-16 transition-colors duration-300 sm:py-24",
+        useTinted ? "bg-surface-alt border-line/60 border-y backdrop-blur-[2px]" : "bg-transparent",
       )}
     >
       <div className="mx-auto max-w-[1120px] px-5 sm:px-8">

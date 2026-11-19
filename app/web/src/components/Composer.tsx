@@ -1,6 +1,7 @@
 // Apple 风格输入框：大圆角纯净卡片 + 经典苹果蓝主胶囊按钮 + 柔和示例胶囊
 import { ArrowUp, Square, X } from "lucide-react"
 
+import { onLiquidMove } from "@/lib/motion"
 import { cn } from "@/lib/utils"
 
 type Props = {
@@ -17,7 +18,7 @@ type Props = {
 export function Composer({ value, onChange, onSubmit, onStop, running, examples, submitLabel = "生成", rows = 2 }: Props) {
   return (
     <div className="space-y-3.5">
-      <div className="apple-card focus-within:ring-2 focus-within:ring-brand/35 rounded-[22px] transition-shadow duration-200">
+      <div onPointerMove={onLiquidMove} className="apple-card focus-within:ring-2 focus-within:ring-brand/35 rounded-[22px] transition-shadow duration-200">
         <div className="relative">
           <textarea
             value={value}
@@ -75,8 +76,8 @@ export function Composer({ value, onChange, onSubmit, onStop, running, examples,
                 className={cn(
                   "h-8 rounded-full px-3.5 text-[12.5px] transition-all duration-200 ease-[var(--ease-spring)] hover:-translate-y-0.5 active:scale-[0.95]",
                   selected
-                    ? "bg-brand text-white font-medium shadow-[0_4px_12px_-3px_rgba(0,113,227,0.45)]"
-                    : "bg-surface text-ink-2 hover:bg-hover hover:text-ink shadow-[0_1px_2px_rgba(0,0,0,0.05)] dark:bg-field",
+                    ? "btn-apple font-medium"
+                    : "liquid-pill text-ink-2 hover:text-ink",
                 )}
               >
                 {ex}

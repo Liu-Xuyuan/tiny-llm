@@ -1,4 +1,4 @@
-// 顶部水平导航（Apple 吸顶液态滑块风格）：胶囊指示底板平滑跟随当前阅读章节与鼠标悬停移动
+// 顶部悬浮液态玻璃导航：晶莹水滴滑块（.liquid-pill）如水银般平滑跟随当前阅读章节与鼠标悬停移动
 import { useEffect, useLayoutEffect, useRef, useState } from "react"
 
 import { cn } from "@/lib/utils"
@@ -42,12 +42,12 @@ export function GlideNav({ items, ready = true }: { items: NavItem[]; ready?: bo
     >
       <span
         aria-hidden
-        className="bg-field pointer-events-none absolute inset-y-0 rounded-full"
+        className="liquid-pill pointer-events-none absolute inset-y-0 rounded-full"
         style={{
           left: pill.left,
           width: pill.width,
           opacity: pill.visible ? 1 : 0,
-          transition: "left 300ms var(--ease-out-strong), width 300ms var(--ease-out-strong), opacity 180ms ease",
+          transition: "left 340ms var(--ease-out-strong), width 340ms var(--ease-out-strong), opacity 180ms ease",
         }}
       />
       {items.map((it, i) => {

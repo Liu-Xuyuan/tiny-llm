@@ -1,5 +1,5 @@
-// 轻量动效 Hook：基于原生 IntersectionObserver 与 requestAnimationFrame，零第三方依赖
-import { useEffect, useRef, useState } from "react"
+// 轻量动效与液态玻璃光学交互 Hook：基于原生浏览器 API，零第三方依赖
+import { useEffect, useRef, useState, type PointerEventHandler } from "react"
 
 /** 监听元素是否进入视口（触发一次后保持可见，用于 Apple 产品页风格的滚动渐显） */
 export function useInView<T extends HTMLElement = HTMLDivElement>(threshold = 0.08) {
@@ -29,7 +29,7 @@ export function useInView<T extends HTMLElement = HTMLDivElement>(threshold = 0.
   return { ref, visible }
 }
 
-/** 实时计算页面滚动进度（0 ~ 1），用于顶栏底部的极细阅读进度光条 */
+/** 实时计算页面滚动进度（0 ~ 1），用于悬浮导航岛底部的极细阅读进度光条 */
 export function useScrollProgress() {
   const [progress, setProgress] = useState(0)
 
@@ -54,4 +54,11 @@ export function useScrollProgress() {
   }, [])
 
   return progress
+}
+
+/** 液态玻璃鼠标高光追踪：把指针相对坐标写入 --mx / --my，驱动玻璃表面的水波镜面反光 */
+export const onLiquidMove: PointerEventHandler<HTMLElement> = (e) => {
+  const r = e.currentTarget.getBoundingClientRect()
+  e.currentTarget.style.setProperty("--mx", `${e.clientX - r.left}px`)
+  e.currentTarget.style.setProperty("--my", `${e.clientY - r.top}px`)
 }

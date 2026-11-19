@@ -1,10 +1,10 @@
-// 页面骨架（Apple.com 旗舰产品页架构）：
-// 顶部吸顶毛玻璃导航栏 + 全幅居中大留白 Hero 首屏 + 五个纯白/浅灰交替铺底的实验章节 + 极简页脚
+// 页面骨架（Apple Liquid Glass 架构）：
+// 全局流动珍珠/黑曜柔彩光场 + 顶部悬浮液态玻璃导航岛 + 雕塑级 Hero 首屏 + 五大通透交替章节
 import { useCallback, useEffect, useState } from "react"
 import { ChevronRight, Moon, Play, Sun } from "lucide-react"
 
 import { api, type Checkpoints } from "@/lib/api"
-import { useScrollProgress } from "@/lib/motion"
+import { onLiquidMove, useScrollProgress } from "@/lib/motion"
 import { GlideNav, type NavItem } from "@/components/GlideNav"
 import { IntroSplash } from "@/components/IntroSplash"
 import { Segmented } from "@/components/Segmented"
@@ -61,11 +61,36 @@ export default function App() {
     <TooltipProvider delayDuration={200}>
       {showIntro && <IntroSplash onDone={() => setShowIntro(false)} />}
 
-      {/* 顶部 Apple 毛玻璃吸顶导航栏 + 底部 2px 实时阅读进度微光线 */}
-      <header className="apple-nav border-line sticky top-0 z-40 border-b">
-        <div className="mx-auto flex h-[52px] max-w-[1120px] items-center justify-between gap-4 px-5 sm:px-8">
-          <a href="#" className="group flex items-center gap-2.5">
-            <span className="text-ink text-[16px] font-semibold tracking-[-0.02em] transition-opacity group-hover:opacity-75">Tiny LLM</span>
+      {/* Apple Studio 棚拍自然中性光影：纯粹无杂色的冷银/黑曜明暗层次，告别廉价彩色渐变坨 */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 -z-10"
+        style={{
+          background:
+            theme === "dark"
+              ? "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255, 255, 255, 0.065), transparent 70%)"
+              : "radial-gradient(ellipse 85% 55% at 50% -8%, rgba(255, 255, 255, 0.95), transparent 68%), linear-gradient(180deg, #ffffff 0%, #f5f5f7 42%, #efeff2 100%)",
+        }}
+      />
+
+      {/* 视口顶边 2px 液态阅读进度细光带（独立于悬浮胶囊岛，不被圆角裁切） */}
+      <div aria-hidden className="pointer-events-none fixed inset-x-0 top-0 z-50 h-[2px] overflow-hidden">
+        <div
+          className="h-full w-full origin-left bg-gradient-to-r from-[#0071e3] via-[#5e5ce6] to-[#c946b8] transition-opacity duration-300 dark:from-[#40a5ff] dark:via-[#8b89ff] dark:to-[#f472b6]"
+          style={{
+            transform: `scaleX(${scrollProgress})`,
+            opacity: scrollProgress > 0.005 ? 0.92 : 0,
+          }}
+        />
+      </div>
+
+      {/* 顶部悬浮液态玻璃导航岛（macOS Tahoe / iOS 26 招牌悬浮胶囊岛） */}
+      <header className="pointer-events-none sticky top-3 z-40 px-4 sm:px-6">
+        <div className="liquid-island pointer-events-auto relative mx-auto flex h-[54px] max-w-[1080px] items-center justify-between gap-4 overflow-hidden rounded-full px-4 sm:px-5">
+          <a href="#" className="group relative z-10 flex items-center gap-2.5 pl-1">
+            <span className="text-ink text-[15.5px] font-semibold tracking-[-0.02em] transition-opacity group-hover:opacity-75">
+              Tiny LLM
+            </span>
             {ckpts && !error && (
               <span className="text-ink-3 hidden items-center gap-1.5 text-[11.5px] sm:inline-flex">
                 <span className="relative flex size-1.5">
@@ -77,16 +102,18 @@ export default function App() {
             )}
           </a>
 
-          <GlideNav items={NAV} ready={ckpts !== null} />
+          <div className="relative z-10">
+            <GlideNav items={NAV} ready={ckpts !== null} />
+          </div>
 
-          <div className="flex items-center gap-2">
+          <div className="relative z-10 flex items-center gap-2">
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
                   type="button"
                   onClick={() => setShowIntro(true)}
                   aria-label="重播开场动画"
-                  className="bg-field text-ink-3 hover:text-ink flex size-7.5 items-center justify-center rounded-full transition-all duration-200 hover:scale-105 active:scale-95"
+                  className="liquid-pill text-ink-2 hover:text-ink flex size-8 items-center justify-center rounded-full transition-all duration-200 hover:scale-105 active:scale-95"
                 >
                   <Play className="size-3 translate-x-[0.5px] fill-current" />
                 </button>
@@ -105,38 +132,17 @@ export default function App() {
             />
           </div>
         </div>
-        {/* GPU 合成层驱动的平滑滚动进度细线 */}
-        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[2px] overflow-hidden">
-          <div
-            className="h-full w-full origin-left bg-gradient-to-r from-[#0071e3] via-[#5e5ce6] to-[#c946b8] transition-opacity duration-300 dark:from-[#40a5ff] dark:via-[#8b89ff] dark:to-[#f472b6]"
-            style={{
-              transform: `scaleX(${scrollProgress})`,
-              opacity: scrollProgress > 0.005 ? 0.9 : 0,
-            }}
-          />
-        </div>
       </header>
 
-      <main className="bg-page min-h-screen">
-        {/* Apple 旗舰产品页风格 Hero 首屏 + 柔和漂移氛围光晕 */}
-        <section className="relative overflow-hidden">
-          <div aria-hidden className="pointer-events-none absolute inset-0 -z-0 overflow-hidden">
-            <div
-              className="ambient-orb absolute -top-24 left-[22%] h-[320px] w-[420px] rounded-full blur-[110px]"
-              style={{ background: "var(--ambient-1)" }}
-            />
-            <div
-              className="ambient-orb-delayed absolute top-6 right-[20%] h-[280px] w-[380px] rounded-full blur-[110px]"
-              style={{ background: "var(--ambient-2)" }}
-            />
-          </div>
-
-          <div className="relative z-10 mx-auto max-w-[1120px] px-5 pt-20 pb-16 text-center sm:px-8 sm:pt-28 sm:pb-24">
-            <p className="reveal text-ink-3 text-[13px] font-semibold tracking-[0.04em]">
+      <main className="relative min-h-screen">
+        {/* Hero 首屏 */}
+        <section className="relative">
+          <div className="relative z-10 mx-auto max-w-[1120px] px-5 pt-18 pb-16 text-center sm:px-8 sm:pt-26 sm:pb-24">
+            <p className="reveal liquid-pill text-ink-2 mx-auto inline-flex items-center rounded-full px-3.5 py-1 text-[12px] font-medium tracking-[0.03em]">
               上海交通大学 · 计算机科学导论 · Topic B03
             </p>
             <h1
-              className="reveal text-ink mx-auto mt-4 max-w-3xl text-[38px] leading-[1.08] font-semibold tracking-[-0.038em] text-balance sm:text-[62px]"
+              className="reveal text-ink mx-auto mt-6 max-w-3xl text-[38px] leading-[1.08] font-semibold tracking-[-0.038em] text-balance sm:text-[62px]"
               style={{ animationDelay: "60ms" }}
             >
               从零训练的
@@ -162,20 +168,21 @@ export default function App() {
               </a>
               <a
                 href="#results"
-                className="group text-brand inline-flex items-center gap-0.5 px-2 text-[15px] font-medium underline-offset-4 hover:underline"
+                className="liquid-pill group text-ink inline-flex h-11 items-center gap-0.5 rounded-full px-5 text-[14.5px] font-medium transition-transform hover:-translate-y-0.5 active:scale-[0.97]"
               >
                 查看评测数据
-                <ChevronRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+                <ChevronRight className="size-4 text-brand transition-transform duration-200 group-hover:translate-x-0.5" />
               </a>
             </div>
 
-            {/* 极简四列核心参数一览 */}
+            {/* 液态玻璃四列核心规格条 */}
             <dl
-              className="reveal border-line mx-auto mt-16 grid max-w-4xl grid-cols-2 gap-y-6 border-t pt-10 sm:grid-cols-4"
+              onPointerMove={onLiquidMove}
+              className="reveal apple-card divide-line mx-auto mt-14 grid max-w-4xl grid-cols-2 divide-x divide-y overflow-hidden rounded-[24px] sm:grid-cols-4 sm:divide-y-0"
               style={{ animationDelay: "240ms" }}
             >
               {HERO_SPECS.map(([val, label]) => (
-                <div key={label} className="rounded-xl px-2 py-1 transition-transform duration-300 ease-[var(--ease-out-strong)] hover:-translate-y-0.5">
+                <div key={label} className="px-4 py-5 transition-colors duration-200 hover:bg-white/25 dark:hover:bg-white/5">
                   <dt className="text-ink text-[15px] font-semibold tracking-[-0.015em] whitespace-nowrap sm:text-[17px]">{val}</dt>
                   <dd className="text-ink-3 mt-1 text-[12px]">{label}</dd>
                 </div>
@@ -183,14 +190,14 @@ export default function App() {
             </dl>
 
             {error && (
-              <div className="bg-destructive/10 text-destructive mx-auto mt-8 max-w-xl rounded-2xl px-4 py-3 text-[13px]">
+              <div className="bg-destructive/12 text-destructive mx-auto mt-8 max-w-xl rounded-2xl px-4 py-3 text-[13px] backdrop-blur-md">
                 连不上后端服务：{error}
               </div>
             )}
           </div>
         </section>
 
-        {/* 五个纯白 / 浅灰交替铺陈的功能章节 */}
+        {/* 五个通透交替铺陈的实验章节 */}
         {ckpts && <GenerateSection index={0} ckpts={ckpts} reload={loadCkpts} />}
         <CompareSection index={1} examples={ckpts?.examples ?? []} />
         <CurveSection index={2} />
@@ -198,8 +205,7 @@ export default function App() {
         <ResultsSection index={4} />
       </main>
 
-      {/* Apple 极简页脚 */}
-      <footer className="bg-surface-alt border-line border-t py-10">
+      <footer className="border-line border-t bg-surface-alt py-10 backdrop-blur-md">
         <div className="text-ink-3 mx-auto flex max-w-[1120px] flex-col justify-between gap-2 px-5 text-[12px] sm:flex-row sm:items-center sm:px-8">
           <span>上海交通大学 计算机科学导论 · B03 从零训练一个迷你语言模型</span>
           <span>Decoder-only Transformer · Built from scratch</span>
