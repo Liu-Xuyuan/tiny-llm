@@ -10,10 +10,17 @@ const CONTINUATION = ", a tiny Transformer learned to imagine."
 const INTRO_CN =
   "从零手写的 0.01B – 0.1B 迷你语言模型。输入任意英文开头，观察它逐 token 自回归续写，并直观对比模型规模、采样参数与训练曲线。"
 
-// Apple Pencil 风格极简笔身：纯白/银灰立体质感 + 苹果蓝微光笔尖
+// Apple Pencil 风格极简笔身：纯白/银灰立体质感 + 书写时苹果蓝柔彩微光笔尖
 function ApplePencil({ writing }: { writing: boolean }) {
   return (
     <span aria-hidden className="pointer-events-none relative ml-1 inline-block h-[1em] w-0 align-baseline">
+      {/* 书写时的笔尖柔彩微光光点 */}
+      <span
+        className={cn(
+          "absolute -left-[4px] bottom-[1px] size-2.5 rounded-full bg-gradient-to-tr from-brand via-indigo-400 to-fuchsia-400 blur-[3px] transition-opacity duration-300",
+          writing ? "nib-glow opacity-90" : "opacity-0",
+        )}
+      />
       <svg
         viewBox="0 0 40 40"
         fill="none"
@@ -108,17 +115,29 @@ export function IntroSplash({ onDone }: { onDone: () => void }) {
         exiting ? "pointer-events-none scale-[1.015] opacity-0" : "opacity-100",
       )}
     >
+      {/* 极其克制的缓慢漂移氛围光晕，增加 Apple Keynote 景深 */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div
+          className="ambient-orb absolute top-[14%] left-[20%] h-[360px] w-[440px] rounded-full blur-[120px]"
+          style={{ background: "var(--ambient-1)" }}
+        />
+        <div
+          className="ambient-orb-delayed absolute right-[18%] bottom-[16%] h-[320px] w-[400px] rounded-full blur-[120px]"
+          style={{ background: "var(--ambient-2)" }}
+        />
+      </div>
+
       {/* 右上角极轻的跳过文字链接 */}
       <button
         type="button"
         onClick={dismiss}
-        className="text-ink-3 hover:text-ink fixed top-6 right-7 text-[13px] font-medium transition-colors"
+        className="text-ink-3 hover:text-ink fixed top-6 right-7 z-10 text-[13px] font-medium transition-colors"
       >
         跳过
       </button>
 
       {/* 无边框纯净排版中心：留白充足，像苹果发布会主视觉 */}
-      <div className="reveal w-full max-w-[780px] text-center">
+      <div className="reveal relative z-10 w-full max-w-[780px] text-center">
         <p className="text-ink-3 mb-7 text-[13px] font-semibold tracking-[0.06em] uppercase">
           SJTU · Topic B03 · Tiny LLM
         </p>
@@ -144,10 +163,10 @@ export function IntroSplash({ onDone }: { onDone: () => void }) {
           <button
             type="button"
             onClick={dismiss}
-            className="btn-apple inline-flex h-11 items-center gap-2 rounded-full px-7 text-[15px] font-medium"
+            className="btn-apple group inline-flex h-11 items-center gap-2 rounded-full px-7 text-[15px] font-medium"
           >
             开始探索
-            <ArrowRight className="size-4" />
+            <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
           </button>
         </div>
       </div>

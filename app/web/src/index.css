@@ -5,7 +5,7 @@
    纯正苹果官网配色与面层：
    - 浅色：纯白 (#ffffff) 与苹果经典浅灰 (#f5f5f7) 交替铺陈，文字 #1d1d1f / #6e6e73，主色 #0071e3
    - 深色：纯黑 (#000000) 与苹果曜石灰 (#161617 / #1d1d1f) 交替，文字 #f5f5f7 / #86868b，主色 #2997ff
-   不画生硬边框，靠细腻面层差、大圆角、巨幅留白与雕塑级排版建立秩序。 */
+   不画生硬边框，靠细腻面层差、大圆角、巨幅留白、雕塑级排版与克制物理动效建立高级质感。 */
 @custom-variant dark (&:is(.dark *));
 
 :root {
@@ -27,9 +27,12 @@
   --brand-soft: rgba(0, 113, 227, 0.09);
   --mark: rgba(0, 113, 227, 0.1);
   --nav-bg: rgba(255, 255, 255, 0.78);
+  --ambient-1: rgba(0, 113, 227, 0.12);
+  --ambient-2: rgba(168, 85, 247, 0.1);
   --shadow-hairline: 0 0 0 1px rgba(0, 0, 0, 0.04);
   --shadow-btn: 0 1px 2px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(0, 0, 0, 0.06);
   --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.04), 0 12px 36px -8px rgba(0, 0, 0, 0.06);
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.07), 0 20px 48px -12px rgba(0, 0, 0, 0.09);
   --shadow-overlay: 0 24px 68px rgba(0, 0, 0, 0.18), 0 4px 16px rgba(0, 0, 0, 0.06);
 }
 
@@ -52,9 +55,12 @@
   --brand-soft: rgba(41, 151, 255, 0.14);
   --mark: rgba(41, 151, 255, 0.18);
   --nav-bg: rgba(22, 22, 23, 0.78);
+  --ambient-1: rgba(41, 151, 255, 0.18);
+  --ambient-2: rgba(168, 85, 247, 0.16);
   --shadow-hairline: 0 0 0 1px rgba(255, 255, 255, 0.08);
   --shadow-btn: 0 1px 2px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
   --shadow-card: 0 0 0 1px rgba(255, 255, 255, 0.07), 0 16px 40px -12px rgba(0, 0, 0, 0.55);
+  --shadow-card-hover: 0 0 0 1px rgba(255, 255, 255, 0.13), 0 24px 56px -12px rgba(0, 0, 0, 0.72);
   --shadow-overlay: 0 0 0 1px rgba(255, 255, 255, 0.12), 0 30px 80px rgba(0, 0, 0, 0.78);
 }
 
@@ -85,6 +91,7 @@
   --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter Variable", "Noto Sans SC Variable", "PingFang SC", "Helvetica Neue", sans-serif;
   --font-mono: "SF Mono", "JetBrains Mono Variable", ui-monospace, Menlo, Consolas, monospace;
   --ease-out-strong: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.32, 0.64, 1);
   --color-page: var(--page);
   --color-canvas: var(--canvas);
   --color-surface: var(--surface);
@@ -138,46 +145,94 @@
   }
 }
 
-/* ------------------------------------------------------------------ Apple 质感材质与组件样式 */
+/* ------------------------------------------------------------------ Apple 质感材质与交互样式 */
 
-/* 顶部苹果风毛玻璃导航条 */
 .apple-nav {
   background: var(--nav-bg);
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
 }
 
-/* Apple Bento 卡片：大圆角、无硬边框、极柔和空气浮层 */
 .apple-card {
   background: var(--surface);
   box-shadow: var(--shadow-card);
+  transition: box-shadow 320ms var(--ease-out-strong), transform 320ms var(--ease-out-strong);
 }
 
-/* 经典苹果蓝主胶囊按钮 */
+.apple-card-hover:hover {
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-3px);
+}
+
+/* 经典苹果蓝主胶囊按钮：悬浮轻抬 + 点击弹簧回弹 */
 .btn-apple {
   background: var(--brand);
   color: #ffffff;
-  transition: background-color 180ms ease, transform 150ms ease, opacity 150ms ease;
+  box-shadow: 0 4px 14px -4px rgba(0, 113, 227, 0.42);
+  transition: background-color 180ms ease, transform 220ms var(--ease-spring), box-shadow 220ms ease, opacity 150ms ease;
 }
 .btn-apple:hover:not(:disabled) {
   background: var(--brand-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px -4px rgba(0, 113, 227, 0.48);
 }
 .btn-apple:active:not(:disabled) {
-  transform: scale(0.97);
+  transform: scale(0.96);
 }
 
-/* Apple Intelligence 柔彩文字渐变（克制用于 Hero 主标题高亮词） */
+/* Apple Intelligence 柔彩流动文字渐变（缓慢呼吸流光，优雅不晃眼） */
+@keyframes ai-gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
 .apple-ai-text {
-  background: linear-gradient(96deg, #0071e3 0%, #5e5ce6 48%, #c946b8 100%);
+  background: linear-gradient(96deg, #0071e3 0%, #5e5ce6 34%, #c946b8 68%, #0071e3 100%);
+  background-size: 220% 100%;
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
+  animation: ai-gradient-shift 9s ease-in-out infinite;
 }
 .dark .apple-ai-text {
-  background: linear-gradient(96deg, #40a5ff 0%, #8b89ff 50%, #f472b6 100%);
+  background: linear-gradient(96deg, #40a5ff 0%, #8b89ff 34%, #f472b6 68%, #40a5ff 100%);
+  background-size: 220% 100%;
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
+  animation: ai-gradient-shift 9s ease-in-out infinite;
+}
+
+/* 流式生成时的 Apple Intelligence 边缘微光呼吸（致敬 macOS / iOS Siri 激活外晕） */
+@keyframes ai-aura {
+  0%, 100% {
+    box-shadow:
+      0 0 0 1px rgba(41, 151, 255, 0.34),
+      0 0 22px -6px rgba(41, 151, 255, 0.28),
+      0 14px 36px -10px rgba(139, 92, 246, 0.2);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(192, 132, 252, 0.44),
+      0 0 28px -4px rgba(168, 85, 247, 0.32),
+      0 14px 40px -10px rgba(236, 72, 153, 0.22);
+  }
+}
+.apple-generating {
+  animation: ai-aura 2.8s ease-in-out infinite;
+}
+
+/* Hero 与开场幕布的极柔和呼吸氛围光晕 */
+@keyframes ambient-float {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(18px, -14px, 0) scale(1.06); }
+}
+.ambient-orb {
+  animation: ambient-float 13s ease-in-out infinite;
+  will-change: transform;
+}
+.ambient-orb-delayed {
+  animation: ambient-float 16s ease-in-out -6s infinite reverse;
+  will-change: transform;
 }
 
 /* 深色模式下的静态 matplotlib 图表自适应 */
@@ -185,29 +240,84 @@
   filter: invert(0.92) hue-rotate(180deg) contrast(1.06) saturate(1.1);
 }
 
-/* ------------------------------------------------------------------ 动效（细腻流畅，遵循 Apple 缓动） */
+/* ------------------------------------------------------------------ 动效（Apple Motion 缓动体系） */
 
+/* 初始首屏进场 */
 @keyframes fade-up {
-  from { opacity: 0; transform: translateY(14px); }
+  from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: none; }
 }
-.reveal { animation: fade-up 680ms var(--ease-out-strong) both; }
+.reveal { animation: fade-up 720ms var(--ease-out-strong) both; }
 
-/* 新生成的文本片段：顺滑淡入 */
-@keyframes token-in { from { opacity: 0; } to { opacity: 1; } }
-.token { animation: token-in 200ms ease-out both; }
+/* 滚动视口渐显：随滚动逐层丝滑上浮 */
+.scroll-item {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 720ms var(--ease-out-strong), transform 760ms var(--ease-out-strong);
+  will-change: opacity, transform;
+}
+.scroll-item.is-visible {
+  opacity: 1;
+  transform: none;
+}
 
-/* 切图淡入：只动画 opacity，绝不覆写 .chart-adaptive 滤镜 */
-@keyframes img-fade-in { from { opacity: 0; } to { opacity: 1; } }
-.img-fade { animation: img-fade-in 280ms ease-out both; }
+/* 模型指标卡数字翻新微弹 */
+@keyframes stat-pop {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+.stat-pop { animation: stat-pop 460ms var(--ease-out-strong) both; }
+
+/* 新生成的文本片段：微距轻浮淡入，文字仿佛自然生长 */
+@keyframes token-in {
+  from { opacity: 0; transform: translateY(2px); }
+  to { opacity: 1; transform: none; }
+}
+.token { display: inline; animation: token-in 220ms ease-out both; }
+
+/* 切图与灯箱缩放淡入：不碰 filter，绝不覆写 .chart-adaptive 滤镜 */
+@keyframes img-zoom-in {
+  from { opacity: 0; transform: scale(0.985); }
+  to { opacity: 1; transform: scale(1); }
+}
+.img-fade { animation: img-zoom-in 340ms var(--ease-out-strong) both; }
+
+/* 性能横向对比条弹性伸展 */
+@keyframes bar-grow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+.bar-grow {
+  transform-origin: left center;
+  animation: bar-grow 860ms var(--ease-out-strong) both;
+}
+
+/* 滑块平滑过渡：
+   - .slider-smooth（切换采样预设、点击轨道、键盘微调）：520ms 清晰利落的平滑滑行
+   - .slider-glide（按住把手连续拖动）：彻底关闭过渡，0ms 实时紧贴指针零卡顿 */
+.slider-smooth [data-slot="slider-range"],
+.slider-smooth > span:not([data-slot="slider-track"]) {
+  transition: left 520ms cubic-bezier(0.25, 0.8, 0.25, 1), right 520ms cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+.slider-glide [data-slot="slider-range"],
+.slider-glide > span:not([data-slot="slider-track"]) {
+  transition: none !important;
+}
 
 /* 开场动画 Apple Pencil 运笔微动 */
 @keyframes pen-write {
   0%, 100% { transform: rotate(-3deg) translateY(0px); }
-  40% { transform: rotate(2.5deg) translateY(-1.8px); }
-  75% { transform: rotate(-1.5deg) translateY(-0.4px); }
+  40% { transform: rotate(2.8deg) translateY(-2px); }
+  75% { transform: rotate(-1.6deg) translateY(-0.5px); }
 }
 .pen-writing { animation: pen-write 340ms ease-in-out infinite; }
+
+/* 笔尖微光脉动 */
+@keyframes nib-glow {
+  0%, 100% { transform: scale(0.85); opacity: 0.55; }
+  50% { transform: scale(1.35); opacity: 0.95; }
+}
+.nib-glow { animation: nib-glow 1.1s ease-in-out infinite; }
 
 /* 等待首 token 扫光文字 */
 @keyframes shimmer { from { background-position: 160%; } to { background-position: -60%; } }
@@ -228,7 +338,7 @@
 .streaming-bar {
   background: linear-gradient(90deg, transparent 0%, #2997ff 30%, #7c6cf6 55%, #ec4899 75%, transparent 100%);
   background-size: 200% 100%;
-  animation: stream-flow 2s linear infinite;
+  animation: stream-flow 1.8s linear infinite;
 }
 
 /* 3×3 像素点阵加载器 */
@@ -245,6 +355,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  .scroll-item { opacity: 1; transform: none; }
   html { scroll-behavior: auto; }
 }
 

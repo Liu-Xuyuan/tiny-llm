@@ -105,7 +105,8 @@ export function FiguresSection({ index }: { index: number }) {
               key={f}
               type="button"
               onClick={() => setActiveIdx(i)}
-              className="bg-surface-alt group overflow-hidden rounded-[22px] text-left transition-transform duration-300 ease-[var(--ease-out-strong)] hover:-translate-y-1 active:scale-[0.99] dark:bg-surface"
+              className="apple-card-hover bg-surface-alt group overflow-hidden rounded-[22px] text-left transition-all duration-300 ease-[var(--ease-out-strong)] active:scale-[0.985] dark:bg-surface"
+              style={{ animation: "fade-up 580ms var(--ease-out-strong) both", animationDelay: `${i * 65}ms` }}
             >
               <div className={cn("overflow-hidden p-3.5 transition-colors", adaptDark ? "bg-white dark:bg-[#141416]" : "bg-white")}>
                 <img

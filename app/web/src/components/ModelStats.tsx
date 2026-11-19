@@ -1,4 +1,4 @@
-// 模型核心规格条（Apple Tech Specs 大数字风格）：去掉多余小图标，靠清晰字号层级与留白呈现高级感
+// 模型核心规格条（Apple Tech Specs 大数字风格）：切换模型时五格数字依次错峰弹性翻新
 import { fmtM, type ModelStats as Stats } from "@/lib/api"
 import { Skeleton } from "@/components/ui/skeleton"
 
@@ -16,8 +16,12 @@ export function ModelStats({ stats }: { stats: Stats | null }) {
   return (
     <div className="apple-card divide-line grid grid-cols-2 divide-x divide-y overflow-hidden rounded-[22px] sm:grid-cols-5 sm:divide-y-0">
       {stats
-        ? items.map(([k, v, sub]) => (
-            <div key={k} className="px-5 py-4 sm:py-5" style={{ animation: "token-in 260ms ease-out both" }}>
+        ? items.map(([k, v, sub], idx) => (
+            <div
+              key={`${stats.ckpt}-${k}`}
+              className="stat-pop hover:bg-field/60 px-5 py-4 transition-colors duration-200 sm:py-5"
+              style={{ animationDelay: `${idx * 45}ms` }}
+            >
               <div className="text-ink-3 text-[12px] font-medium">{k}</div>
               <div className="text-ink mt-1.5 text-[22px] leading-none font-semibold tracking-[-0.025em] tabular-nums">
                 {v}

@@ -8,8 +8,12 @@ function Slider({
   value,
   min = 0,
   max = 100,
+  onPointerDown,
   ...props
 }: React.ComponentProps<typeof SliderPrimitive.Root>) {
+  // 只有按住并真正水平拖动超过 4px 时才进入连续阻尼态；点击轨道、键盘调节、切换预设均走完整 650ms 平滑过渡
+  const [gliding, setGliding] = React.useState(false)
+
   const _values = React.useMemo(
     () =>
       Array.isArray(value)
@@ -20,6 +24,21 @@ function Slider({
     [value, defaultValue, min, max]
   )
 
+  const handlePointerDown: React.PointerEventHandler<HTMLSpanElement> = (e) => {
+    const startX = e.clientX
+    const onMove = (ev: PointerEvent) => {
+      if (Math.abs(ev.clientX - startX) > 2) setGliding(true)
+    }
+    const stop = () => {
+      setGliding(false)
+      window.removeEventListener("pointermove", onMove)
+    }
+    window.addEventListener("pointermove", onMove)
+    window.addEventListener("pointerup", stop, { once: true })
+    window.addEventListener("pointercancel", stop, { once: true })
+    onPointerDown?.(e)
+  }
+
   return (
     <SliderPrimitive.Root
       data-slot="slider"
@@ -27,8 +46,10 @@ function Slider({
       value={value}
       min={min}
       max={max}
+      onPointerDown={handlePointerDown}
       className={cn(
         "relative flex w-full touch-none items-center select-none data-[disabled]:opacity-50 data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-44 data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col",
+        gliding ? "slider-glide" : "slider-smooth",
         className
       )}
       {...props}

@@ -51,13 +51,13 @@ export function Composer({ value, onChange, onSubmit, onStop, running, examples,
             onClick={running ? onStop : onSubmit}
             disabled={!running && !value.trim()}
             className={cn(
-              "flex h-9 items-center gap-1.5 rounded-full px-4.5 text-[13.5px] font-medium transition-all duration-150 disabled:pointer-events-none disabled:opacity-35",
+              "group flex h-9 items-center gap-1.5 rounded-full px-4.5 text-[13.5px] font-medium transition-all duration-150 disabled:pointer-events-none disabled:opacity-35",
               running
                 ? "bg-destructive/12 text-destructive hover:bg-destructive/18 active:scale-[0.97]"
                 : "btn-apple",
             )}
           >
-            {running ? <Square className="size-3 fill-current" /> : <ArrowUp className="size-4" />}
+            {running ? <Square className="size-3 fill-current" /> : <ArrowUp className="size-4 transition-transform duration-200 group-hover:-translate-y-0.5" />}
             {running ? "停止" : submitLabel}
           </button>
         </div>
@@ -73,9 +73,9 @@ export function Composer({ value, onChange, onSubmit, onStop, running, examples,
                 type="button"
                 onClick={() => onChange(ex)}
                 className={cn(
-                  "h-8 rounded-full px-3.5 text-[12.5px] transition-all duration-150 active:scale-[0.97]",
+                  "h-8 rounded-full px-3.5 text-[12.5px] transition-all duration-200 ease-[var(--ease-spring)] hover:-translate-y-0.5 active:scale-[0.95]",
                   selected
-                    ? "bg-brand text-white font-medium"
+                    ? "bg-brand text-white font-medium shadow-[0_4px_12px_-3px_rgba(0,113,227,0.45)]"
                     : "bg-surface text-ink-2 hover:bg-hover hover:text-ink shadow-[0_1px_2px_rgba(0,0,0,0.05)] dark:bg-field",
                 )}
               >
