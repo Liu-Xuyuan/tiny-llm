@@ -1,11 +1,13 @@
-// 页面骨架：居中的细线纸面；左边吸顶侧栏（标题、深浅色切换、目录、项目信息），右边编号区块依次排列
+// 页面骨架（Apple.com 旗舰产品页架构）：
+// 顶部吸顶毛玻璃导航栏 + 全幅居中大留白 Hero 首屏 + 五个纯白/浅灰交替铺底的实验章节 + 极简页脚
 import { useCallback, useEffect, useState } from "react"
-import { Moon, Sun } from "lucide-react"
+import { ChevronRight, Moon, Play, Sun } from "lucide-react"
 
 import { api, type Checkpoints } from "@/lib/api"
 import { GlideNav, type NavItem } from "@/components/GlideNav"
+import { IntroSplash } from "@/components/IntroSplash"
 import { Segmented } from "@/components/Segmented"
-import { TooltipProvider } from "@/components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { CompareSection } from "@/sections/CompareSection"
 import { GenerateSection } from "@/sections/GenerateSection"
 import { CurveSection, FiguresSection, ResultsSection } from "@/sections/TrainingSections"
@@ -18,15 +20,13 @@ const NAV: NavItem[] = [
   { id: "results", label: "结果表" },
 ]
 
-const FACTS: [string, string][] = [
-  ["结构", "Decoder-only Transformer"],
-  ["数据", "SmolLM-Corpus + TinyStories"],
-  ["词表", "BPE 8192"],
-  ["上下文", "512"],
-  ["规模", "0.01B / 0.05B / 0.1B"],
+const HERO_SPECS: [string, string][] = [
+  ["0.01B – 0.1B", "三种参数规模"],
+  ["BPE 8192", "自训练词表"],
+  ["512", "上下文窗口"],
+  ["SmolLM · TinyStories", "双语料预训练"],
 ]
 
-// 深浅色：在 <html> 上加 / 去 .dark 类；偏好存 localStorage（隐私模式下可能不可用，所以 try/catch）
 type Theme = "light" | "dark"
 function useTheme(): [Theme, (t: Theme) => void] {
   const [theme, setTheme] = useState<Theme>(() => {
@@ -43,71 +43,140 @@ function useTheme(): [Theme, (t: Theme) => void] {
   return [theme, setTheme]
 }
 
-// 侧栏左上角的标志：3×3 小方块，与生成时的点阵加载器呼应
-function Mark() {
-  return (
-    <span aria-hidden className="grid grid-cols-[repeat(3,6px)] gap-[2px]">
-      {[1, 0.35, 1, 0.35, 1, 0.35, 1, 0.35, 1].map((o, i) => <span key={i} className="bg-ink size-1.5 rounded-[1.5px]" style={{ opacity: o }} />)}
-    </span>
-  )
-}
-
 export default function App() {
   const [theme, setTheme] = useTheme()
+  const [showIntro, setShowIntro] = useState(true)
   const [ckpts, setCkpts] = useState<Checkpoints | null>(null)
   const [error, setError] = useState("")
 
   const loadCkpts = useCallback(() => {
+    setError("")
     api.checkpoints().then(setCkpts).catch((e) => setError(String(e)))
   }, [])
   useEffect(loadCkpts, [loadCkpts])
 
   return (
     <TooltipProvider delayDuration={200}>
-      <main className="bg-page relative mx-auto min-h-screen max-w-[1120px] shadow-[0_0_0_1px_var(--line)]">
-        <div className="lg:grid lg:grid-cols-[264px_minmax(0,1fr)]">
-          <aside className="border-line flex flex-col border-b border-dashed px-5 pt-12 pb-6 sm:px-7 lg:sticky lg:top-0 lg:h-screen lg:border-r lg:border-b-0 lg:pt-[clamp(2.5rem,8vh,5rem)]">
-            <div className="reveal flex items-center justify-between">
-              <Mark />
-              <Segmented size="sm" value={theme} onChange={setTheme} options={[
-                { value: "light", label: <Sun className="size-3.5" />, title: "浅色" },
-                { value: "dark", label: <Moon className="size-3.5" />, title: "深色" },
-              ]} />
-            </div>
-            <div className="reveal" style={{ animationDelay: "60ms" }}>
-              <h1 className="text-ink mt-10 text-[21px] leading-snug font-semibold tracking-[-0.02em] text-balance">
-                从零训练的<br />迷你语言模型。
-              </h1>
-              <p className="text-ink-3 mt-2 text-[12.5px] leading-relaxed text-pretty">
-                手写的 Decoder-only Transformer，用 next-token prediction 训练。输入一段开头，看它逐个 token 续写。
-              </p>
-            </div>
-            <div className="reveal border-line mt-7 hidden border-t border-dashed pt-6 lg:block" style={{ animationDelay: "120ms" }}>
-              <GlideNav items={NAV} ready={ckpts !== null} />
-            </div>
-            <dl className="reveal border-line mt-auto hidden space-y-1.5 border-t border-dashed pt-5 text-[11.5px] lg:block" style={{ animationDelay: "180ms" }}>
-              {FACTS.map(([k, v]) => (
-                <div key={k} className="flex justify-between gap-3">
-                  <dt className="text-ink-3">{k}</dt>
-                  <dd className="text-ink-2 truncate text-right">{v}</dd>
-                </div>
-              ))}
-            </dl>
-          </aside>
+      {showIntro && <IntroSplash onDone={() => setShowIntro(false)} />}
 
-          <div className="min-w-0 pt-4 pb-12 lg:pt-6">
-            {error && <div className="text-ink-2 mx-5 mt-4 rounded-[10px] p-3 text-[12.5px] shadow-[var(--shadow-card)] sm:mx-8">连不上后端：{error}</div>}
-            {ckpts && <GenerateSection index={0} ckpts={ckpts} reload={loadCkpts} />}
-            <CompareSection index={1} examples={ckpts?.examples ?? []} />
-            <CurveSection index={2} />
-            <FiguresSection index={3} />
-            <ResultsSection index={4} />
-            <footer className="text-ink-3 px-5 pt-8 text-[11.5px] sm:px-8">
-              上海交通大学 计算机科学导论 · B03 从零训练一个迷你语言模型
-            </footer>
+      {/* 顶部 Apple 毛玻璃吸顶导航栏 */}
+      <header className="apple-nav border-line sticky top-0 z-40 border-b">
+        <div className="mx-auto flex h-[52px] max-w-[1120px] items-center justify-between gap-4 px-5 sm:px-8">
+          <a href="#" className="flex items-center gap-2.5">
+            <span className="text-ink text-[16px] font-semibold tracking-[-0.02em]">Tiny LLM</span>
+            {ckpts && !error && (
+              <span className="text-ink-3 hidden items-center gap-1.5 text-[11.5px] sm:inline-flex">
+                <span className="size-1.5 rounded-full bg-emerald-500" />
+                {ckpts.items.length} 个模型就绪
+              </span>
+            )}
+          </a>
+
+          <GlideNav items={NAV} ready={ckpts !== null} />
+
+          <div className="flex items-center gap-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={() => setShowIntro(true)}
+                  aria-label="重播开场动画"
+                  className="bg-field text-ink-3 hover:text-ink flex size-7.5 items-center justify-center rounded-full transition-colors"
+                >
+                  <Play className="size-3 translate-x-[0.5px] fill-current" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>重播开场动画</TooltipContent>
+            </Tooltip>
+
+            <Segmented
+              size="sm"
+              value={theme}
+              onChange={setTheme}
+              options={[
+                { value: "light", label: <Sun className="size-3.5" />, title: "浅色外观" },
+                { value: "dark", label: <Moon className="size-3.5" />, title: "深色外观" },
+              ]}
+            />
           </div>
         </div>
+      </header>
+
+      <main className="bg-page min-h-screen">
+        {/* Apple 旗舰产品页风格 Hero 首屏 */}
+        <section className="mx-auto max-w-[1120px] px-5 pt-20 pb-16 text-center sm:px-8 sm:pt-28 sm:pb-24">
+          <p className="reveal text-ink-3 text-[13px] font-semibold tracking-[0.04em]">
+            上海交通大学 · 计算机科学导论 · Topic B03
+          </p>
+          <h1
+            className="reveal text-ink mx-auto mt-4 max-w-3xl text-[38px] leading-[1.08] font-semibold tracking-[-0.038em] text-balance sm:text-[62px]"
+            style={{ animationDelay: "60ms" }}
+          >
+            从零训练的
+            <br />
+            <span className="apple-ai-text">迷你语言模型</span>
+          </h1>
+          <p
+            className="reveal text-ink-3 mx-auto mt-6 max-w-2xl text-[17px] leading-[1.55] font-normal tracking-[-0.012em] text-pretty sm:text-[21px]"
+            style={{ animationDelay: "120ms" }}
+          >
+            手写 Decoder-only Transformer，用 next-token prediction 完整实现预训练、自回归生成与多规模对照实验。
+          </p>
+
+          <div
+            className="reveal mt-9 flex flex-wrap items-center justify-center gap-4"
+            style={{ animationDelay: "180ms" }}
+          >
+            <a
+              href="#generate"
+              className="btn-apple inline-flex h-11 items-center rounded-full px-6 text-[15px] font-medium"
+            >
+              开始体验生成
+            </a>
+            <a
+              href="#results"
+              className="text-brand hover:underline inline-flex items-center gap-0.5 px-2 text-[15px] font-medium underline-offset-4"
+            >
+              查看评测数据
+              <ChevronRight className="size-4" />
+            </a>
+          </div>
+
+          {/* 极简四列核心参数一览 */}
+          <dl
+            className="reveal border-line mx-auto mt-16 grid max-w-4xl grid-cols-2 gap-y-6 border-t pt-10 sm:grid-cols-4"
+            style={{ animationDelay: "240ms" }}
+          >
+            {HERO_SPECS.map(([val, label]) => (
+              <div key={label} className="px-2">
+                <dt className="text-ink text-[15px] font-semibold tracking-[-0.015em] whitespace-nowrap sm:text-[17px]">{val}</dt>
+                <dd className="text-ink-3 mt-1 text-[12px]">{label}</dd>
+              </div>
+            ))}
+          </dl>
+
+          {error && (
+            <div className="bg-destructive/10 text-destructive mx-auto mt-8 max-w-xl rounded-2xl px-4 py-3 text-[13px]">
+              连不上后端服务：{error}
+            </div>
+          )}
+        </section>
+
+        {/* 五个纯白 / 浅灰交替铺陈的功能章节 */}
+        {ckpts && <GenerateSection index={0} ckpts={ckpts} reload={loadCkpts} />}
+        <CompareSection index={1} examples={ckpts?.examples ?? []} />
+        <CurveSection index={2} />
+        <FiguresSection index={3} />
+        <ResultsSection index={4} />
       </main>
+
+      {/* Apple 极简页脚 */}
+      <footer className="bg-surface-alt border-line border-t py-10">
+        <div className="text-ink-3 mx-auto flex max-w-[1120px] flex-col justify-between gap-2 px-5 text-[12px] sm:flex-row sm:items-center sm:px-8">
+          <span>上海交通大学 计算机科学导论 · B03 从零训练一个迷你语言模型</span>
+          <span>Decoder-only Transformer · Built from scratch</span>
+        </div>
+      </footer>
     </TooltipProvider>
   )
 }

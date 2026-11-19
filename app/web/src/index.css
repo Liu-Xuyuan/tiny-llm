@@ -1,76 +1,94 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-/* ------------------------------------------------------------------ 主题
-   克制的中性灰：纸面（page）/ 展示底（canvas）/ 卡片（surface）三层，文字三级（ink / ink-2 / ink-3）。
-   没有亮色，强调靠字重、细线和阴影。shadcn 组件用的变量（--background、--primary…）映射到这套颜色上。 */
+/* ------------------------------------------------------------------ Apple 设计系统变量
+   纯正苹果官网配色与面层：
+   - 浅色：纯白 (#ffffff) 与苹果经典浅灰 (#f5f5f7) 交替铺陈，文字 #1d1d1f / #6e6e73，主色 #0071e3
+   - 深色：纯黑 (#000000) 与苹果曜石灰 (#161617 / #1d1d1f) 交替，文字 #f5f5f7 / #86868b，主色 #2997ff
+   不画生硬边框，靠细腻面层差、大圆角、巨幅留白与雕塑级排版建立秩序。 */
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --page: oklch(0.985 0.001 286);
-  --canvas: oklch(0.962 0.002 250);
-  --surface: oklch(1 0 0);
-  --field: oklch(0.96 0.001 286);
-  --hover: oklch(0.945 0.002 250);
-  --line: oklch(0.935 0.003 265);
-  --line-strong: oklch(0.89 0.005 260);
-  --ink: oklch(0.25 0.006 258);
-  --ink-2: oklch(0.45 0.008 258);
-  --ink-3: oklch(0.6 0.008 258);
-  --mark: oklch(0.93 0.004 260); /* prompt 高亮底色 */
-  --shadow-hairline: 0 0 0 1px var(--line);
-  --shadow-btn: 0 0 0 1px var(--line-strong), 0 1px 2px oklch(0 0 0 / 0.05);
-  --shadow-card: 0 0 0 1px var(--line), 0 1px 2px oklch(0 0 0 / 0.03), 0 6px 18px oklch(0 0 0 / 0.035);
-  --shadow-overlay: 0 0 0 1px var(--line), 0 24px 48px oklch(0 0 0 / 0.08), 0 6px 12px oklch(0 0 0 / 0.04);
+  --page: #ffffff;
+  --canvas: #f5f5f7;
+  --surface: #ffffff;
+  --surface-solid: #ffffff;
+  --surface-alt: #f5f5f7;
+  --field: #f5f5f7;
+  --hover: #e8e8ed;
+  --line: rgba(0, 0, 0, 0.08);
+  --line-strong: rgba(0, 0, 0, 0.14);
+  --ink: #1d1d1f;
+  --ink-2: #424245;
+  --ink-3: #6e6e73;
+  --brand: #0071e3;
+  --brand-hover: #0077ed;
+  --brand-2: #5e5ce6;
+  --brand-soft: rgba(0, 113, 227, 0.09);
+  --mark: rgba(0, 113, 227, 0.1);
+  --nav-bg: rgba(255, 255, 255, 0.78);
+  --shadow-hairline: 0 0 0 1px rgba(0, 0, 0, 0.04);
+  --shadow-btn: 0 1px 2px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(0, 0, 0, 0.06);
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.04), 0 12px 36px -8px rgba(0, 0, 0, 0.06);
+  --shadow-overlay: 0 24px 68px rgba(0, 0, 0, 0.18), 0 4px 16px rgba(0, 0, 0, 0.06);
 }
 
 .dark {
-  --page: oklch(0.205 0.004 265);
-  --canvas: oklch(0.228 0.004 265);
-  --surface: oklch(0.26 0.006 271);
-  --field: oklch(0.29 0.006 271);
-  --hover: oklch(0.29 0.006 271);
-  --line: oklch(0.3 0.006 258);
-  --line-strong: oklch(0.36 0.007 264);
-  --ink: oklch(0.95 0.002 248);
-  --ink-2: oklch(0.78 0.006 255);
-  --ink-3: oklch(0.6 0.008 258);
-  --mark: oklch(0.34 0.008 262);
-  --shadow-btn: 0 0 0 1px oklch(1 0 0 / 0.1), 0 1px 2px oklch(0 0 0 / 0.3);
-  --shadow-card: 0 0 0 1px oklch(1 0 0 / 0.1), 0 1px 2px oklch(0 0 0 / 0.2), 0 2px 6px oklch(0 0 0 / 0.2);
-  --shadow-overlay: 0 0 0 1px oklch(1 0 0 / 0.14), 0 8px 28px oklch(0 0 0 / 0.34);
+  --page: #000000;
+  --canvas: #111113;
+  --surface: #1d1d1f;
+  --surface-solid: #1d1d1f;
+  --surface-alt: #161617;
+  --field: #262629;
+  --hover: #323236;
+  --line: rgba(255, 255, 255, 0.1);
+  --line-strong: rgba(255, 255, 255, 0.18);
+  --ink: #f5f5f7;
+  --ink-2: #d2d2d7;
+  --ink-3: #86868b;
+  --brand: #2997ff;
+  --brand-hover: #40a5ff;
+  --brand-2: #a855f7;
+  --brand-soft: rgba(41, 151, 255, 0.14);
+  --mark: rgba(41, 151, 255, 0.18);
+  --nav-bg: rgba(22, 22, 23, 0.78);
+  --shadow-hairline: 0 0 0 1px rgba(255, 255, 255, 0.08);
+  --shadow-btn: 0 1px 2px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  --shadow-card: 0 0 0 1px rgba(255, 255, 255, 0.07), 0 16px 40px -12px rgba(0, 0, 0, 0.55);
+  --shadow-overlay: 0 0 0 1px rgba(255, 255, 255, 0.12), 0 30px 80px rgba(0, 0, 0, 0.78);
 }
 
 :root, .dark {
-  --radius: 0.5rem;
+  --radius: 0.75rem;
   --background: var(--page);
   --foreground: var(--ink);
-  --card: var(--surface);
+  --card: var(--surface-solid);
   --card-foreground: var(--ink);
-  --popover: var(--surface);
+  --popover: var(--surface-solid);
   --popover-foreground: var(--ink);
-  --primary: var(--ink);
-  --primary-foreground: var(--page);
+  --primary: var(--brand);
+  --primary-foreground: #ffffff;
   --secondary: var(--field);
   --secondary-foreground: var(--ink);
   --muted: var(--field);
   --muted-foreground: var(--ink-3);
   --accent: var(--hover);
   --accent-foreground: var(--ink);
-  --destructive: oklch(0.58 0.15 25);
+  --destructive: #ff3b30;
   --border: var(--line);
   --input: var(--line-strong);
-  --ring: var(--ink-3);
+  --ring: var(--brand);
 }
 
 @theme inline {
-  /* 英文和数字先用 Inter，Inter 里没有的汉字自动落到思源黑体；后面是加载失败时的系统字体兜底 */
-  --font-sans: "Inter Variable", "Noto Sans SC Variable", ui-sans-serif, system-ui, "PingFang SC", "Microsoft YaHei", sans-serif;
-  --font-mono: "JetBrains Mono Variable", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  /* Mac 上直接启用原生 SF Pro / 苹方，非 Mac 优雅回退至打包好的 Inter + 思源黑体 */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter Variable", "Noto Sans SC Variable", "PingFang SC", "Helvetica Neue", sans-serif;
+  --font-mono: "SF Mono", "JetBrains Mono Variable", ui-monospace, Menlo, Consolas, monospace;
+  --ease-out-strong: cubic-bezier(0.22, 1, 0.36, 1);
   --color-page: var(--page);
   --color-canvas: var(--canvas);
   --color-surface: var(--surface);
+  --color-surface-alt: var(--surface-alt);
   --color-field: var(--field);
   --color-hover: var(--hover);
   --color-line: var(--line);
@@ -78,6 +96,9 @@
   --color-ink: var(--ink);
   --color-ink-2: var(--ink-2);
   --color-ink-3: var(--ink-3);
+  --color-brand: var(--brand);
+  --color-brand-2: var(--brand-2);
+  --color-brand-soft: var(--brand-soft);
   --color-mark: var(--mark);
   --shadow-hairline: var(--shadow-hairline);
   --shadow-btn: var(--shadow-btn);
@@ -110,46 +131,115 @@
 @layer base {
   * { @apply border-border outline-ring/50; }
   html { scroll-behavior: smooth; }
-  body { @apply bg-canvas text-ink font-sans antialiased; font-feature-settings: "cv11", "ss01"; }
+  body {
+    @apply bg-page text-ink font-sans antialiased;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
 }
 
-/* ------------------------------------------------------------------ 动效 */
+/* ------------------------------------------------------------------ Apple 质感材质与组件样式 */
 
-/* 进场：上移 8px + 淡入 + 轻微模糊，各区块依次错开（style 里给 animation-delay） */
-@keyframes fade-up {
-  from { opacity: 0; transform: translateY(8px); filter: blur(2px); }
-  to { opacity: 1; transform: none; filter: none; }
+/* 顶部苹果风毛玻璃导航条 */
+.apple-nav {
+  background: var(--nav-bg);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
 }
-.reveal { animation: fade-up 600ms var(--ease-out-strong) both; }
 
-/* 新生成的文本片段：淡入 + 去模糊 */
-@keyframes token-in { from { opacity: 0; filter: blur(3px); } to { opacity: 1; filter: none; } }
-.token { animation: token-in 260ms ease-out both; }
+/* Apple Bento 卡片：大圆角、无硬边框、极柔和空气浮层 */
+.apple-card {
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+}
 
-/* 弹出（对话框等） */
-@keyframes pop-in { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
-.pop-in { animation: pop-in 200ms var(--ease-out-strong) both; }
+/* 经典苹果蓝主胶囊按钮 */
+.btn-apple {
+  background: var(--brand);
+  color: #ffffff;
+  transition: background-color 180ms ease, transform 150ms ease, opacity 150ms ease;
+}
+.btn-apple:hover:not(:disabled) {
+  background: var(--brand-hover);
+}
+.btn-apple:active:not(:disabled) {
+  transform: scale(0.97);
+}
 
-/* 文字上扫过一道高光：等待第一个 token 时的"生成中" */
-@keyframes shimmer { from { background-position: 150%; } to { background-position: -50%; } }
-.shimmer {
-  color: transparent;
-  background: linear-gradient(90deg, var(--ink-3) 35%, var(--ink) 50%, var(--ink-3) 65%);
-  background-size: 200% 100%;
+/* Apple Intelligence 柔彩文字渐变（克制用于 Hero 主标题高亮词） */
+.apple-ai-text {
+  background: linear-gradient(96deg, #0071e3 0%, #5e5ce6 48%, #c946b8 100%);
   background-clip: text;
   -webkit-background-clip: text;
-  animation: shimmer 1.4s linear infinite;
+  color: transparent;
+}
+.dark .apple-ai-text {
+  background: linear-gradient(96deg, #40a5ff 0%, #8b89ff 50%, #f472b6 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
 }
 
-/* 3×3 像素点阵加载器：每个点按不同延迟亮起 */
-@keyframes pixel { 0%, 100% { opacity: 0.15; } 18%, 42% { opacity: 1; } 62% { opacity: 0.15; } }
-.pixel { animation: pixel 650ms ease-in-out infinite; opacity: 0.15; }
+/* 深色模式下的静态 matplotlib 图表自适应 */
+.dark .chart-adaptive {
+  filter: invert(0.92) hue-rotate(180deg) contrast(1.06) saturate(1.1);
+}
 
-/* 细竖线光标：生成中常亮，结束后闪烁 */
+/* ------------------------------------------------------------------ 动效（细腻流畅，遵循 Apple 缓动） */
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+.reveal { animation: fade-up 680ms var(--ease-out-strong) both; }
+
+/* 新生成的文本片段：顺滑淡入 */
+@keyframes token-in { from { opacity: 0; } to { opacity: 1; } }
+.token { animation: token-in 200ms ease-out both; }
+
+/* 切图淡入：只动画 opacity，绝不覆写 .chart-adaptive 滤镜 */
+@keyframes img-fade-in { from { opacity: 0; } to { opacity: 1; } }
+.img-fade { animation: img-fade-in 280ms ease-out both; }
+
+/* 开场动画 Apple Pencil 运笔微动 */
+@keyframes pen-write {
+  0%, 100% { transform: rotate(-3deg) translateY(0px); }
+  40% { transform: rotate(2.5deg) translateY(-1.8px); }
+  75% { transform: rotate(-1.5deg) translateY(-0.4px); }
+}
+.pen-writing { animation: pen-write 340ms ease-in-out infinite; }
+
+/* 等待首 token 扫光文字 */
+@keyframes shimmer { from { background-position: 160%; } to { background-position: -60%; } }
+.shimmer {
+  color: transparent;
+  background: linear-gradient(90deg, var(--ink-3) 32%, var(--ink) 50%, var(--ink-3) 68%);
+  background-size: 220% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: shimmer 1.5s linear infinite;
+}
+
+/* 生成中卡片顶部极细 Apple Intelligence 流光条 */
+@keyframes stream-flow {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+.streaming-bar {
+  background: linear-gradient(90deg, transparent 0%, #2997ff 30%, #7c6cf6 55%, #ec4899 75%, transparent 100%);
+  background-size: 200% 100%;
+  animation: stream-flow 2s linear infinite;
+}
+
+/* 3×3 像素点阵加载器 */
+@keyframes pixel { 0%, 100% { opacity: 0.16; } 22%, 44% { opacity: 0.95; } 68% { opacity: 0.16; } }
+.pixel { animation: pixel 720ms ease-in-out infinite; opacity: 0.16; }
+
+/* 苹果风细竖线光标 */
 @keyframes caret-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 .caret {
   display: inline-block; width: 2px; height: 1.05em; margin-left: 2px; border-radius: 1px;
-  background: var(--ink); vertical-align: text-bottom; animation: caret-blink 1s step-end infinite;
+  background: var(--brand); vertical-align: text-bottom; animation: caret-blink 1s step-end infinite;
 }
 .caret.is-streaming { animation: none; }
 
@@ -158,10 +248,13 @@
   html { scroll-behavior: auto; }
 }
 
-/* ------------------------------------------------------------------ 结果表（react-markdown 渲染出的原生 table） */
+/* ------------------------------------------------------------------ Apple Tech Specs 风格结果表 */
 .md-table table { width: 100%; border-collapse: collapse; font-size: 12.5px; font-variant-numeric: tabular-nums; }
-.md-table th, .md-table td { border-bottom: 1px solid var(--line); padding: 7px 10px; text-align: left; white-space: nowrap; }
-.md-table th { color: var(--ink-3); font-weight: 500; }
-.md-table tbody tr { transition: background-color 120ms; }
-.md-table tbody tr:hover { background: var(--hover); }
-.md-table p { margin: 8px 0; color: var(--ink-3); font-size: 12px; white-space: normal; }
+.md-table th, .md-table td { border-bottom: 1px solid var(--line); padding: 11px 9px; text-align: left; white-space: nowrap; }
+.md-table th { color: var(--ink-3); font-size: 11.5px; font-weight: 500; }
+.md-table td { color: var(--ink-2); }
+.md-table td:first-child { color: var(--ink); font-weight: 600; }
+.md-table tbody tr { transition: background-color 140ms ease; }
+.md-table tbody tr:last-child td { border-bottom: 0; }
+.md-table tbody tr:hover { background: var(--field); }
+.md-table p { margin: 14px 12px 4px; color: var(--ink-3); font-size: 12px; line-height: 1.65; white-space: normal; }

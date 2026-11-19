@@ -14,8 +14,8 @@ export function PixelLoader({ label = "生成中" }: { label?: string }) {
 
   return (
     <div role="status" className="flex w-fit items-center gap-2.5">
-      <span aria-hidden className="grid grid-cols-[repeat(3,4px)] gap-[1.5px]">
-        {DELAYS.map((d, i) => <span key={i} className="pixel bg-ink size-1 rounded-[1px]" style={{ animationDelay: `${d}ms` }} />)}
+      <span aria-hidden className="grid grid-cols-[repeat(3,4.5px)] gap-[2px]">
+        {DELAYS.map((d, i) => <span key={i} className="pixel bg-brand size-[4.5px] rounded-[1.5px]" style={{ animationDelay: `${d}ms` }} />)}
       </span>
       <span className="shimmer text-[13px] font-medium">{label}</span>
       <span className="text-ink-3 font-mono text-[12px] tabular-nums">{elapsed.toFixed(1)}s</span>

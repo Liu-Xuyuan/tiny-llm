@@ -1,0 +1,82 @@
+// 界面展示用的辅助元数据：模型规模色标 + 对比图中文标题映射（新增未知图片时自动回退到文件名）
+
+export type ModelBadge = {
+  tag: string
+  dot: string
+  pill: string
+  bar: string
+}
+
+const MODEL_STYLES: Record<string, ModelBadge> = {
+  s10m: {
+    tag: "0.01B",
+    dot: "bg-emerald-500",
+    pill: "bg-emerald-500/12 text-emerald-700 dark:text-emerald-300 ring-emerald-500/25",
+    bar: "from-emerald-400 to-teal-500",
+  },
+  s50m: {
+    tag: "0.05B",
+    dot: "bg-indigo-500",
+    pill: "bg-indigo-500/12 text-indigo-700 dark:text-indigo-300 ring-indigo-500/25",
+    bar: "from-indigo-400 to-sky-500",
+  },
+  s100m: {
+    tag: "0.10B",
+    dot: "bg-violet-500",
+    pill: "bg-violet-500/12 text-violet-700 dark:text-violet-300 ring-violet-500/25",
+    bar: "from-violet-500 to-fuchsia-500",
+  },
+}
+
+const DEFAULT_BADGE: ModelBadge = {
+  tag: "LLM",
+  dot: "bg-sky-500",
+  pill: "bg-sky-500/12 text-sky-700 dark:text-sky-300 ring-sky-500/25",
+  bar: "from-sky-400 to-indigo-500",
+}
+
+/** 按 run 名或 checkpoint 路径匹配对应的模型规模色标 */
+export function getModelBadge(name: string): ModelBadge {
+  const lower = name.toLowerCase()
+  if (lower.includes("s100m")) return MODEL_STYLES.s100m
+  if (lower.includes("s50m")) return MODEL_STYLES.s50m
+  if (lower.includes("s10m")) return MODEL_STYLES.s10m
+  return DEFAULT_BADGE
+}
+
+export type FigureMeta = { title: string; subtitle: string }
+
+const FIGURE_META: Record<string, FigureMeta> = {
+  "scaling.png": {
+    title: "规模扩展曲线（Scaling Law）",
+    subtitle: "参数量从 10M 到 100M 的验证集 loss 变化趋势",
+  },
+  "train_val_gap.png": {
+    title: "训练与验证损失差（Train / Val Gap）",
+    subtitle: "观察各规模模型的泛化能力与过拟合程度",
+  },
+  "val_overlay_tokens.png": {
+    title: "验证集 Loss 叠图（按 Token 数）",
+    subtitle: "相同已训练 token 预算下，不同规模模型的收敛效率对比",
+  },
+  "val_overlay_time.png": {
+    title: "验证集 Loss 叠图（按训练时长）",
+    subtitle: "云端 RTX 5090 实际挂钟时间与损失下降的关系",
+  },
+  "val_smollm_overlay.png": {
+    title: "SmolLM 验证集对比",
+    subtitle: "科普与说明文语料上的验证损失曲线",
+  },
+  "val_tinystories_overlay.png": {
+    title: "TinyStories 验证集对比",
+    subtitle: "英文短篇故事语料上的验证损失曲线",
+  },
+}
+
+/** 根据对比图文件名返回中文标题；后续新增实验图未登记时回退为文件名 */
+export function getFigureMeta(filename: string): FigureMeta {
+  return FIGURE_META[filename] ?? {
+    title: filename.replace(/\.png$/i, "").replace(/[_-]+/g, " "),
+    subtitle: "实验结果对比图",
+  }
+}

@@ -1,4 +1,4 @@
-// 一个编号区块："01  标题  一句说明"，下面是灰底展示区；进场时按 index 依次错开淡入上移
+// Apple 产品页风格章节容器：交替纯白 / 浅灰全幅背景，居中大标题 + 充沛呼吸留白，彻底告别“框中框”
 import type { ReactNode } from "react"
 
 import { cn } from "@/lib/utils"
@@ -8,24 +8,40 @@ type Props = {
   index: number
   title: string
   desc: string
-  aside?: ReactNode // 标题行右侧的控件（比如 run 选择）
+  aside?: ReactNode // 标题栏右侧的控件（如 run 切换、暗色适配）
   children: ReactNode
+  tinted?: boolean // true 时使用苹果经典浅灰 (#f5f5f7) / 暗色曜石灰 (#161617) 交替铺底
   surfaceClassName?: string
 }
 
-export function Section({ id, index, title, desc, aside, children, surfaceClassName }: Props) {
+export function Section({ id, index, title, desc, aside, children, tinted, surfaceClassName }: Props) {
+  // 默认奇偶章节自动交替底色，像 apple.com 产品页一样靠色块分章而非虚线边框
+  const useTinted = tinted ?? index % 2 === 0
+
   return (
-    <section id={id} className="reveal border-line flex scroll-mt-6 flex-col border-b border-dashed px-5 py-8 sm:px-8 sm:py-10"
-      style={{ animationDelay: `${index * 120}ms` }}>
-      <div className="mb-3 flex items-center gap-3">
-        <div className="flex min-w-0 flex-1 items-baseline gap-2">
-          <span className="text-ink-3 font-mono text-[11px] tabular-nums">{String(index + 1).padStart(2, "0")}</span>
-          <h2 className="text-ink text-[13px] font-semibold whitespace-nowrap">{title}</h2>
-          <p className="text-ink-3 truncate text-[12.5px]">{desc}</p>
+    <section
+      id={id}
+      className={cn(
+        "scroll-mt-14 py-16 transition-colors duration-300 sm:py-24",
+        useTinted ? "bg-surface-alt" : "bg-page",
+      )}
+    >
+      <div className="mx-auto max-w-[1120px] px-5 sm:px-8">
+        <div className="mb-8 flex flex-col justify-between gap-4 sm:mb-10 sm:flex-row sm:items-end">
+          <div className="max-w-2xl">
+            <p className="text-ink-3 mb-2 font-mono text-[12px] font-medium tracking-[0.04em]">
+              {String(index + 1).padStart(2, "0")}
+            </p>
+            <h2 className="text-ink text-[28px] leading-[1.15] font-semibold tracking-[-0.028em] sm:text-[36px]">
+              {title}
+            </h2>
+            <p className="text-ink-3 mt-2.5 text-[15px] leading-relaxed sm:text-[17px]">{desc}</p>
+          </div>
+          {aside && <div className="shrink-0">{aside}</div>}
         </div>
-        {aside}
+
+        <div className={cn(surfaceClassName)}>{children}</div>
       </div>
-      <div className={cn("bg-canvas shadow-hairline relative rounded-[14px] p-3", surfaceClassName)}>{children}</div>
     </section>
   )
 }
