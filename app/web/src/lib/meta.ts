@@ -80,3 +80,15 @@ export function getFigureMeta(filename: string): FigureMeta {
     subtitle: "实验结果对比图",
   }
 }
+
+// 正式训练 run 的核心指标摘要（数字与 docs/figures/results.md、bpb.md 严格一致；未知新 run 自动隐藏）
+const RUN_SUMMARY: Record<string, string[]> = {
+  s10m: ["13.99M 参数", "0.30B tokens", "Val 3.098", "困惑度 22.2", "4.6 min (RTX 5090)"],
+  s50m: ["54.81M 参数", "1.00B tokens", "Val 2.543", "困惑度 12.7", "45.2 min (RTX 5090)"],
+  s100m: ["105.92M 参数", "1.50B tokens", "Val 2.409", "困惑度 11.1", "115.9 min (RTX 5090)"],
+  s10m_char: ["实验 C · 字符级分词对照", "词表 336", "SmolLM bpb 1.602", "TinyStories bpb 0.929"],
+}
+
+export function getRunSummary(run: string | null): string[] | null {
+  return run ? (RUN_SUMMARY[run] ?? null) : null
+}

@@ -26,7 +26,7 @@ export function Section({ id, index, eyebrow, title, desc, aside, children, tint
       id={id}
       className={cn(
         "scroll-mt-20 py-16 transition-colors duration-300 sm:py-24",
-        useTinted ? "bg-surface-alt border-line/60 border-y backdrop-blur-[2px]" : "bg-transparent",
+        useTinted ? "bg-surface-alt border-line/60 border-y" : "bg-transparent",
       )}
     >
       <div className="mx-auto max-w-[1120px] px-5 sm:px-8">

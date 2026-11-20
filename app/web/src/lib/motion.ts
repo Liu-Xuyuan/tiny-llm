@@ -29,16 +29,20 @@ export function useInView<T extends HTMLElement = HTMLDivElement>(threshold = 0.
   return { ref, visible }
 }
 
-/** 实时计算页面滚动进度（0 ~ 1），用于悬浮导航岛底部的极细阅读进度光条 */
-export function useScrollProgress() {
-  const [progress, setProgress] = useState(0)
+/** 零重渲染滚动进度条 Hook：直接通过 rAF 驱动 GPU transform，滚动全程 0 次 React 重渲染 */
+export function useScrollProgressRef() {
+  const barRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     let raf = 0
     const update = () => {
       raf = 0
+      const el = barRef.current
+      if (!el) return
       const max = document.documentElement.scrollHeight - window.innerHeight
-      setProgress(max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0)
+      const p = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0
+      el.style.transform = `scaleX(${p})`
+      el.style.opacity = p > 0.005 ? "0.92" : "0"
     }
     const onScroll = () => {
       if (!raf) raf = window.requestAnimationFrame(update)
@@ -53,12 +57,21 @@ export function useScrollProgress() {
     }
   }, [])
 
-  return progress
+  return barRef
 }
 
-/** 液态玻璃鼠标高光追踪：把指针相对坐标写入 --mx / --my，驱动玻璃表面的水波镜面反光 */
+/** 液态玻璃鼠标高光追踪：rAF 合批更新 --mx / --my，避免高频同步重排导致掉帧 */
+const liquidRaf = new WeakMap<HTMLElement, number>()
 export const onLiquidMove: PointerEventHandler<HTMLElement> = (e) => {
-  const r = e.currentTarget.getBoundingClientRect()
-  e.currentTarget.style.setProperty("--mx", `${e.clientX - r.left}px`)
-  e.currentTarget.style.setProperty("--my", `${e.clientY - r.top}px`)
+  const el = e.currentTarget
+  if (liquidRaf.has(el)) return
+  const clientX = e.clientX
+  const clientY = e.clientY
+  const id = window.requestAnimationFrame(() => {
+    liquidRaf.delete(el)
+    const r = el.getBoundingClientRect()
+    el.style.setProperty("--mx", `${clientX - r.left}px`)
+    el.style.setProperty("--my", `${clientY - r.top}px`)
+  })
+  liquidRaf.set(el, id)
 }

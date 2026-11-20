@@ -97,7 +97,7 @@ export function GenerateSection({ index, ckpts, reload }: { index: number; ckpts
                   examples={ckpts.examples}
                 />
               </div>
-              <OutputCard out={out} className="min-h-0 max-h-[380px] flex-1 lg:max-h-none" />
+              <OutputCard out={out} onRegenerate={generate} className="h-[340px] lg:h-auto lg:min-h-0 lg:flex-1" />
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 // 区块 02：三模型对比（真 GPU 物理过渡的 Apple Wallet 3D 堆叠卡片：三张卡全程 absolute + translate3d/scale 丝滑互换）
 import { useEffect, useLayoutEffect, useRef, useState } from "react"
-import { Check, ChevronDown, ChevronLeft, ChevronRight, Copy, SlidersHorizontal } from "lucide-react"
+import { ArrowDown, Check, ChevronDown, ChevronLeft, ChevronRight, Copy, SlidersHorizontal } from "lucide-react"
 
 import { api, fmtM, type CompareModel, type SamplingParams } from "@/lib/api"
 import { getModelBadge } from "@/lib/meta"
@@ -26,6 +26,7 @@ function DeckCardBody({
 }) {
   const [elapsed, setElapsed] = useState(0)
   const [scrolledTop, setScrolledTop] = useState(false)
+  const [awayFromBottom, setAwayFromBottom] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
   const stickBottom = useRef(true)
   const started = out.running || out.chunks.length > 0 || out.done || out.error
@@ -34,6 +35,7 @@ function DeckCardBody({
   useEffect(() => {
     if (!out.running) return
     stickBottom.current = true
+    setAwayFromBottom(false)
     const t0 = performance.now()
     setElapsed(0)
     const id = setInterval(() => setElapsed((performance.now() - t0) / 1000), 100)
@@ -50,8 +52,18 @@ function DeckCardBody({
   const handleScroll = () => {
     const el = scrollRef.current
     if (!el) return
-    stickBottom.current = el.scrollHeight - el.scrollTop - el.clientHeight <= 28
+    const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= 28
+    stickBottom.current = nearBottom
+    setAwayFromBottom(!nearBottom && el.scrollHeight > el.clientHeight + 24)
     setScrolledTop(el.scrollTop > 4)
+  }
+
+  const scrollToBottom = () => {
+    const el = scrollRef.current
+    if (!el) return
+    stickBottom.current = true
+    setAwayFromBottom(false)
+    el.scrollTo({ top: el.scrollHeight, behavior: "smooth" })
   }
 
   if (!started) {
@@ -76,19 +88,32 @@ function DeckCardBody({
 
   return (
     <div className="flex h-[270px] flex-col">
-      <div
-        ref={scrollRef}
-        onScroll={handleScroll}
-        className={cn("apple-scroll min-h-0 flex-1 overflow-y-auto pr-2", scrolledTop && "scroll-fade-top")}
-      >
-        <p className="typo-editorial text-ink text-[17.5px] leading-[1.9] tracking-[-0.004em] whitespace-pre-wrap">
-          <span className="bg-mark text-ink mr-0.5 rounded-[6px] px-1.5 py-0.5 font-medium italic">{out.prompt}</span>
-          {out.chunks.map((c, i) => <span key={i} className="token">{c}</span>)}
-          {(out.running || out.done) && <span className={cn("caret", out.running && "is-streaming")} />}
-        </p>
+      <div className="relative flex min-h-0 flex-1 flex-col">
+        <div
+          ref={scrollRef}
+          onScroll={handleScroll}
+          className={cn("apple-scroll -mr-2.5 min-h-0 flex-1 overflow-y-auto pr-2.5", scrolledTop && "scroll-fade-top")}
+        >
+          <p className="typo-editorial text-ink text-justify text-[17.5px] leading-[1.9] tracking-[-0.004em] whitespace-pre-wrap [text-justify:inter-word]">
+            <span className="bg-mark text-ink mr-0.5 rounded-[6px] px-1.5 py-0.5 font-medium italic">{out.prompt}</span>
+            {out.chunks.map((c, i) => <span key={i} className="token">{c}</span>)}
+            {(out.running || out.done) && <span className={cn("caret", out.running && "is-streaming")} />}
+          </p>
 
-        {out.error && (
-          <p className="bg-destructive/10 text-destructive mt-4 rounded-xl px-3.5 py-2 text-[13px]">{out.error}</p>
+          {out.error && (
+            <p className="bg-destructive/10 text-destructive mt-4 rounded-xl px-3.5 py-2 text-[13px]">{out.error}</p>
+          )}
+        </div>
+
+        {awayFromBottom && (
+          <button
+            type="button"
+            onClick={scrollToBottom}
+            className="liquid-pill text-ink hover:text-brand absolute bottom-2 left-1/2 z-20 inline-flex -translate-x-1/2 items-center gap-1 rounded-full px-3 py-1 text-[11.5px] font-medium transition-all hover:scale-105 active:scale-95"
+          >
+            <ArrowDown className="size-3" />
+            回到最新
+          </button>
         )}
       </div>
 
@@ -182,7 +207,7 @@ export function CompareSection({ index, examples }: { index: number; examples: s
     } catch { /* 无剪贴板权限时忽略 */ }
   }
 
-  const summary = `Temperature ${params.temperature} · Top-k ${params.top_k || "不限"} · Top-p ${params.top_p >= 1 ? "不限" : params.top_p} · ${params.max_new_tokens} tok · Seed ${params.seed}`
+  const summary = `Temperature ${params.temperature === 0 ? "贪心" : params.temperature} · Top-k ${params.top_k || "不限"} · Top-p ${params.top_p >= 1 ? "不限" : params.top_p} · ${params.max_new_tokens} tok · Seed ${params.seed === -1 ? "随机" : params.seed}`
 
   const speedRows = models
     .map((m, i) => ({ idx: i, run: m.run, tok_s: outs[i]?.done?.tok_s ?? 0, seconds: outs[i]?.done?.seconds ?? 0 }))

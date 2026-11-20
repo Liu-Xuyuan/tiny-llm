@@ -408,7 +408,7 @@ export function IntroSplash({
 
         <div
           className={cn(
-            "mt-11 flex items-center justify-center gap-4 transition-all duration-500 ease-[var(--ease-out-strong)]",
+            "mt-11 flex flex-col items-center justify-center gap-3 transition-all duration-500 ease-[var(--ease-out-strong)]",
             finished ? "translate-y-0 opacity-100" : "translate-y-2 opacity-60 hover:opacity-100",
           )}
         >
@@ -420,6 +420,14 @@ export function IntroSplash({
             开始探索
             <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
           </button>
+          <span
+            className={cn(
+              "text-ink-3 text-[12px] transition-opacity duration-500",
+              finished ? "opacity-75" : "opacity-0",
+            )}
+          >
+            按 Enter 或向下滚动进入
+          </span>
         </div>
       </div>
     </div>

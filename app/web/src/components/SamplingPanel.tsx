@@ -86,30 +86,43 @@ export function SamplingPanel({ value, onChange }: { value: SamplingParams; onCh
         <SliderRow s={LENGTH_SLIDER} value={value.max_new_tokens} onChange={(v) => set({ max_new_tokens: v })} />
 
         <div className="flex items-center justify-between gap-3 text-[13px]">
-          <span className="text-ink-2 font-medium">Seed</span>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="text-ink-2 cursor-help font-medium">Seed</span>
+            </TooltipTrigger>
+            <TooltipContent side="right" className="max-w-60">
+              随机种子：固定数字可复现同一结果；点右侧骰子可在「每次随机」与「固定 42」之间一键切换
+            </TooltipContent>
+          </Tooltip>
           <div className="liquid-well flex h-8 items-center rounded-full pl-3.5 pr-1">
             <input
               type="number"
-              value={value.seed}
+              value={value.seed === -1 ? "" : value.seed}
+              placeholder="随机"
               aria-label="seed"
-              onChange={(e) => set({ seed: Number.parseInt(e.target.value || "0", 10) })}
-              className="typo-num text-ink w-20 bg-transparent text-[13px] font-medium outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+              onChange={(e) => {
+                const raw = e.target.value.trim()
+                set({ seed: raw === "" ? -1 : Number.parseInt(raw, 10) })
+              }}
+              className="typo-num text-ink placeholder:text-brand w-20 bg-transparent text-[13px] font-medium outline-none placeholder:font-medium [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
             />
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
                   type="button"
-                  onClick={() => set({ seed: -1 })}
-                  aria-label="随机 seed"
+                  onClick={() => set({ seed: value.seed === -1 ? 42 : -1 })}
+                  aria-label={value.seed === -1 ? "切回固定 seed 42" : "切换为每次随机 seed"}
                   className={cn(
-                    "hover:text-ink flex size-6.5 items-center justify-center rounded-full transition-colors",
-                    value.seed === -1 ? "bg-brand text-white" : "text-ink-3",
+                    "hover:text-ink flex size-6.5 items-center justify-center rounded-full transition-all active:scale-90",
+                    value.seed === -1 ? "bg-brand text-white hover:text-white" : "text-ink-3",
                   )}
                 >
                   <Dices className="size-3.5" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent>-1 = 每次随机（结果下方显示实际用的 seed）</TooltipContent>
+              <TooltipContent>
+                {value.seed === -1 ? "当前每次随机，点击切回固定 42" : "点击切换为每次随机（生成后显示实际 Seed）"}
+              </TooltipContent>
             </Tooltip>
           </div>
         </div>

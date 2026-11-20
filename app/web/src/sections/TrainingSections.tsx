@@ -5,7 +5,7 @@ import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 
 import { api, type ResultTable } from "@/lib/api"
-import { getFigureMeta } from "@/lib/meta"
+import { getFigureMeta, getRunSummary } from "@/lib/meta"
 import { onLiquidMove } from "@/lib/motion"
 import { Section } from "@/components/Section"
 import { Segmented } from "@/components/Segmented"
@@ -39,6 +39,8 @@ export function CurveSection({ index }: { index: number }) {
     api.runs().then((r) => { setRuns(r); setRun(r.includes("s100m") ? "s100m" : (r[0] ?? null)) }).catch(console.error)
   }, [])
 
+  const runSummary = getRunSummary(run)
+
   return (
     <Section
       id="curve"
@@ -56,15 +58,42 @@ export function CurveSection({ index }: { index: number }) {
       }
     >
       <div onPointerMove={onLiquidMove} className="apple-card overflow-hidden rounded-[24px] p-4 sm:p-6">
-        <div className={cn("overflow-hidden rounded-[16px] transition-colors duration-200", adaptDark ? "bg-white dark:bg-[#141416]" : "bg-white")}>
-          {run && (
-            <img
-              key={run}
-              src={`/api/runs/${encodeURIComponent(run)}/curve`}
-              alt={`${run} loss 曲线`}
-              className={cn("img-fade w-full", adaptDark && "chart-adaptive")}
-            />
+        {runSummary && (
+          <div
+            key={run}
+            className="stat-pop border-line typo-num mb-4 flex flex-wrap items-center gap-2 border-b pb-3.5 text-[12px]"
+          >
+            <span className="text-ink mr-1 text-[13px] font-semibold tracking-[-0.01em]">{run}</span>
+            {runSummary.map((item) => (
+              <span key={item} className="bg-field text-ink-2 rounded-full px-2.5 py-0.5 leading-snug">
+                {item}
+              </span>
+            ))}
+          </div>
+        )}
+        {/* 所有实验的 Loss 曲线同尺寸叠放并预加载，切换时平滑交叉淡入淡出与微缩放，无闪白、无高度跳动 */}
+        <div
+          className={cn(
+            "relative grid aspect-[8/3] overflow-hidden rounded-[16px] transition-colors duration-200",
+            adaptDark ? "bg-white dark:bg-[#141416]" : "bg-white",
           )}
+        >
+          {runs.map((r) => {
+            const isActive = r === run
+            return (
+              <img
+                key={r}
+                src={`/api/runs/${encodeURIComponent(r)}/curve`}
+                alt={`${r} loss 曲线`}
+                aria-hidden={!isActive}
+                className={cn(
+                  "col-start-1 row-start-1 h-full w-full object-contain transition-[opacity,transform] duration-500 ease-[var(--ease-out-strong)]",
+                  adaptDark && "chart-adaptive",
+                  isActive ? "z-10 scale-100 opacity-100" : "pointer-events-none z-0 scale-[0.985] opacity-0",
+                )}
+              />
+            )
+          })}
         </div>
       </div>
     </Section>

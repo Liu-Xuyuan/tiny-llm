@@ -12,9 +12,9 @@
 :root {
   --page: #f5f5f7;
   --canvas: #f5f5f7;
-  --surface: rgba(255, 255, 255, 0.72);
+  --surface: rgba(255, 255, 255, 0.88);
   --surface-solid: #ffffff;
-  --surface-alt: rgba(255, 255, 255, 0.45);
+  --surface-alt: rgba(255, 255, 255, 0.52);
   --field: rgba(0, 0, 0, 0.045);
   --hover: rgba(0, 0, 0, 0.075);
   --line: rgba(0, 0, 0, 0.075);
@@ -43,9 +43,9 @@
 .dark {
   --page: #000000;
   --canvas: #000000;
-  --surface: rgba(29, 29, 31, 0.68);
+  --surface: rgba(29, 29, 31, 0.86);
   --surface-solid: #1d1d1f;
-  --surface-alt: rgba(22, 22, 23, 0.6);
+  --surface-alt: rgba(22, 22, 23, 0.65);
   --field: rgba(255, 255, 255, 0.07);
   --hover: rgba(255, 255, 255, 0.12);
   --line: rgba(255, 255, 255, 0.1);
@@ -193,13 +193,14 @@
 /* ------------------------------------------------------------------ Apple Liquid Glass 光学材质
    放在 @layer components 中，确保 Tailwind 的 absolute / sticky 等 utility 类始终可正确覆盖 position */
 @layer components {
-  /* 悬浮液态玻璃导航岛（macOS Tahoe / iOS 26 标志性悬浮透明胶囊） */
+  /* 悬浮液态玻璃导航岛（macOS Tahoe / iOS 26 标志性悬浮透明胶囊：仅顶栏与浮层开启实时 backdrop-filter，保证整页 120fps 丝滑滚动） */
   .liquid-island {
     position: relative;
     background: var(--nav-bg);
     box-shadow: var(--shadow-island);
-    backdrop-filter: blur(28px) saturate(220%) brightness(1.04);
-    -webkit-backdrop-filter: blur(28px) saturate(220%) brightness(1.04);
+    backdrop-filter: blur(20px) saturate(190%);
+    -webkit-backdrop-filter: blur(20px) saturate(190%);
+    transform: translateZ(0);
   }
   .liquid-island::before {
     content: "";
@@ -211,13 +212,11 @@
     opacity: 0.7;
   }
 
-  /* 核心液态玻璃卡片：高饱和光学透光 + 镜面高光棱边 + 斜面玻璃光泽 + 鼠标水波高光 */
+  /* 核心液态玻璃卡片：镜面高光棱边 + 斜面玻璃光泽 + 鼠标水波高光（零嵌套 backdrop-filter，避免视网膜屏滚动掉帧） */
   .apple-card {
     position: relative;
     background: var(--surface);
     box-shadow: var(--shadow-card);
-    backdrop-filter: blur(24px) saturate(200%) brightness(1.03);
-    -webkit-backdrop-filter: blur(24px) saturate(200%) brightness(1.03);
     transition: box-shadow 340ms var(--ease-out-strong), transform 340ms var(--ease-out-strong), background-color 280ms ease;
   }
   .apple-card::before {
@@ -255,10 +254,8 @@
 
   /* 液态水滴胶囊（分段器滑块、导航水珠滑块、次要液态按钮） */
   .liquid-pill {
-    background: rgba(255, 255, 255, 0.78);
+    background: rgba(255, 255, 255, 0.88);
     box-shadow: var(--shadow-btn);
-    backdrop-filter: blur(16px) saturate(190%);
-    -webkit-backdrop-filter: blur(16px) saturate(190%);
   }
   .dark .liquid-pill {
     background: rgba(255, 255, 255, 0.14);
@@ -268,8 +265,6 @@
   .liquid-well {
     background: var(--field);
     box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.06), inset 0 -1px 0 rgba(255, 255, 255, 0.65);
-    backdrop-filter: blur(16px) saturate(170%);
-    -webkit-backdrop-filter: blur(16px) saturate(170%);
   }
   .dark .liquid-well {
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.45), inset 0 -1px 0 rgba(255, 255, 255, 0.1);
@@ -284,7 +279,6 @@
       inset 0 1.5px 0 0 rgba(255, 255, 255, 0.45),
       inset 0 -1px 1px 0 rgba(0, 52, 128, 0.25),
       0 8px 22px -6px rgba(0, 113, 227, 0.55);
-    backdrop-filter: blur(12px);
     transition: filter 180ms ease, transform 220ms var(--ease-spring), box-shadow 220ms ease, opacity 150ms ease;
   }
   .btn-apple:hover:not(:disabled) {
@@ -310,26 +304,18 @@
   }
 }
 
-/* Apple Intelligence 柔彩流动文字渐变 */
-@keyframes ai-gradient-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
+/* Apple Intelligence 柔彩文字渐变（静态零重绘，避免主线程每帧触发背景位置重绘） */
 .apple-ai-text {
-  background: linear-gradient(96deg, #0071e3 0%, #5e5ce6 34%, #c946b8 68%, #0071e3 100%);
-  background-size: 220% 100%;
+  background: linear-gradient(96deg, #0071e3 0%, #5e5ce6 52%, #c946b8 100%);
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
-  animation: ai-gradient-shift 9s ease-in-out infinite;
 }
 .dark .apple-ai-text {
-  background: linear-gradient(96deg, #40a5ff 0%, #8b89ff 34%, #f472b6 68%, #40a5ff 100%);
-  background-size: 220% 100%;
+  background: linear-gradient(96deg, #40a5ff 0%, #8b89ff 52%, #f472b6 100%);
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
-  animation: ai-gradient-shift 9s ease-in-out infinite;
 }
 
 /* 流式生成时的 Apple Intelligence 边缘液态微光呼吸 */
@@ -384,7 +370,6 @@
   opacity: 0;
   transform: translateY(22px);
   transition: opacity 720ms var(--ease-out-strong), transform 760ms var(--ease-out-strong);
-  will-change: opacity, transform;
 }
 .scroll-item.is-visible {
   opacity: 1;
@@ -432,14 +417,12 @@
 
 /* iOS 26 液态玻璃滑块水滴圆珠：平时晶莹透亮，按住拖拽时微微延展如液态水晶 */
 .liquid-thumb {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(240, 245, 255, 0.86) 100%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(240, 245, 255, 0.92) 100%);
   box-shadow:
     inset 0 1.5px 1px rgba(255, 255, 255, 1),
     inset 0 -1px 2px rgba(0, 113, 227, 0.14),
     0 2px 8px rgba(15, 23, 42, 0.2),
     0 0 0 0.5px rgba(15, 23, 42, 0.08);
-  backdrop-filter: blur(10px) saturate(180%);
-  -webkit-backdrop-filter: blur(10px) saturate(180%);
 }
 .liquid-thumb:active {
   background: rgba(255, 255, 255, 0.52);
@@ -515,6 +498,14 @@
 }
 
 /* ------------------------------------------------------------------ Apple 极简细滚动条与顶部渐隐遮罩 */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 .apple-scroll {
   scrollbar-width: thin;
   scrollbar-color: rgba(128, 128, 134, 0.35) transparent;

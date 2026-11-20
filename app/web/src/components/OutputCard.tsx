@@ -1,6 +1,6 @@
 // Apple 风格输出卡片：固定高度不撑变形，超出下边界时自动平滑上滑显示新内容，顶部柔和渐隐，支持手动回看
 import { useEffect, useRef, useState } from "react"
-import { Check, Copy } from "lucide-react"
+import { ArrowDown, Check, Copy, RotateCw } from "lucide-react"
 
 import type { GenDone } from "@/lib/api"
 import { onLiquidMove } from "@/lib/motion"
@@ -15,16 +15,19 @@ export function OutputCard({
   out,
   placeholder,
   queued = false,
+  onRegenerate,
   className,
 }: {
   out: Output
   placeholder?: string
   queued?: boolean
+  onRegenerate?: () => void
   className?: string
 }) {
   const [copied, setCopied] = useState(false)
   const [elapsed, setElapsed] = useState(0)
   const [scrolledTop, setScrolledTop] = useState(false)
+  const [awayFromBottom, setAwayFromBottom] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
   const stickBottom = useRef(true)
 
@@ -34,6 +37,7 @@ export function OutputCard({
   useEffect(() => {
     if (!out.running) return
     stickBottom.current = true
+    setAwayFromBottom(false)
     const t0 = performance.now()
     setElapsed(0)
     const id = setInterval(() => setElapsed((performance.now() - t0) / 1000), 100)
@@ -52,8 +56,18 @@ export function OutputCard({
     const el = scrollRef.current
     if (!el) return
     const distToBottom = el.scrollHeight - el.scrollTop - el.clientHeight
-    stickBottom.current = distToBottom <= 28
+    const nearBottom = distToBottom <= 28
+    stickBottom.current = nearBottom
+    setAwayFromBottom(!nearBottom && el.scrollHeight > el.clientHeight + 24)
     setScrolledTop(el.scrollTop > 4)
+  }
+
+  const scrollToBottom = () => {
+    const el = scrollRef.current
+    if (!el) return
+    stickBottom.current = true
+    setAwayFromBottom(false)
+    el.scrollTo({ top: el.scrollHeight, behavior: "smooth" })
   }
 
   const copy = async () => {
@@ -84,43 +98,83 @@ export function OutputCard({
         <div className="m-auto"><PixelLoader /></div>
       ) : (
         <>
-          {out.chunks.length > 0 && !out.running && (
-            <button
-              onClick={copy}
-              title={copied ? "已复制" : "复制全文"}
+          {/* 固定高度顶栏：放置状态标签与操作按钮，不挤压正文右侧空间，保证正文全宽两端对齐且生成结束零跳动 */}
+          <div className="mb-3 flex h-7.5 shrink-0 items-center justify-between gap-2">
+            <span className="text-ink-3 inline-flex items-center gap-1.5 text-[11.5px] font-medium tracking-[0.02em]">
+              {out.running ? (
+                <>
+                  <span className="bg-brand size-1.5 animate-pulse rounded-full" />
+                  <span>正在续写</span>
+                </>
+              ) : (
+                <span>生成结果</span>
+              )}
+            </span>
+
+            {out.chunks.length > 0 && !out.running && (
+              <div className="flex items-center gap-1.5 opacity-85 transition-opacity duration-150 group-hover/out:opacity-100">
+                {onRegenerate && (
+                  <button
+                    type="button"
+                    onClick={onRegenerate}
+                    title="重新生成"
+                    className="liquid-pill text-ink-2 hover:text-ink flex size-7.5 items-center justify-center rounded-full transition-all duration-200 hover:scale-105 active:rotate-180"
+                  >
+                    <RotateCw className="size-3.5" />
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={copy}
+                  title={copied ? "已复制" : "复制全文"}
+                  className={cn(
+                    "flex h-7.5 items-center gap-1.5 rounded-full px-3 text-[12px] font-medium transition-all duration-150",
+                    copied
+                      ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 opacity-100"
+                      : "liquid-pill text-ink-2 hover:text-ink",
+                  )}
+                >
+                  {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
+                  <span>{copied ? "已复制" : "复制"}</span>
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* 内部滚动视口：全宽两端对齐，-mr-2.5 pr-2.5 让文本右边与底栏严格齐平且为细滚动条留出呼吸槽 */}
+          <div className="relative flex min-h-0 flex-1 flex-col">
+            <div
+              ref={scrollRef}
+              onScroll={handleScroll}
               className={cn(
-                "absolute top-5 right-5 z-20 flex h-7.5 items-center gap-1.5 rounded-full px-3 text-[12px] font-medium transition-all duration-150",
-                copied
-                  ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 opacity-100"
-                  : "liquid-pill text-ink-2 hover:text-ink opacity-80 group-hover/out:opacity-100",
+                "apple-scroll -mr-2.5 min-h-0 flex-1 overflow-y-auto pr-2.5",
+                scrolledTop && "scroll-fade-top",
               )}
             >
-              {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
-              <span>{copied ? "已复制" : "复制"}</span>
-            </button>
-          )}
-
-          {/* 内部滚动视口：超出下边界时平滑上滑显示下方新内容，不拉长外框 */}
-          <div
-            ref={scrollRef}
-            onScroll={handleScroll}
-            className={cn(
-              "apple-scroll min-h-0 flex-1 overflow-y-auto pr-2",
-              scrolledTop && "scroll-fade-top",
-            )}
-          >
-            <p className="typo-editorial text-ink pr-18 text-[17.5px] leading-[1.9] tracking-[-0.004em] whitespace-pre-wrap">
-              <span className="bg-mark text-ink mr-0.5 rounded-[6px] px-1.5 py-0.5 font-medium italic">
-                {out.prompt}
-              </span>
-              {out.chunks.map((c, i) => <span key={i} className="token">{c}</span>)}
-              {(out.running || out.done) && <span className={cn("caret", out.running && "is-streaming")} />}
-            </p>
-
-            {out.error && (
-              <p className="bg-destructive/10 text-destructive mt-4 rounded-xl px-3.5 py-2 text-[13px]">
-                {out.error}
+              <p className="typo-editorial text-ink text-justify text-[17.5px] leading-[1.9] tracking-[-0.004em] whitespace-pre-wrap [text-justify:inter-word]">
+                <span className="bg-mark text-ink mr-0.5 rounded-[6px] px-1.5 py-0.5 font-medium italic">
+                  {out.prompt}
+                </span>
+                {out.chunks.map((c, i) => <span key={i} className="token">{c}</span>)}
+                {(out.running || out.done) && <span className={cn("caret", out.running && "is-streaming")} />}
               </p>
+
+              {out.error && (
+                <p className="bg-destructive/10 text-destructive mt-4 rounded-xl px-3.5 py-2 text-[13px]">
+                  {out.error}
+                </p>
+              )}
+            </div>
+
+            {awayFromBottom && (
+              <button
+                type="button"
+                onClick={scrollToBottom}
+                className="liquid-pill text-ink hover:text-brand absolute bottom-2 left-1/2 z-20 inline-flex -translate-x-1/2 items-center gap-1 rounded-full px-3 py-1 text-[11.5px] font-medium transition-all hover:scale-105 active:scale-95"
+              >
+                <ArrowDown className="size-3" />
+                回到最新
+              </button>
             )}
           </div>
 

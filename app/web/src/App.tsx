@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react"
 import { ChevronRight, Moon, Play, Sun } from "lucide-react"
 
 import { api, type Checkpoints } from "@/lib/api"
-import { onLiquidMove, useScrollProgress } from "@/lib/motion"
+import { onLiquidMove, useScrollProgressRef } from "@/lib/motion"
 import { GlideNav, type NavItem } from "@/components/GlideNav"
 import { IntroSplash } from "@/components/IntroSplash"
 import { Segmented } from "@/components/Segmented"
@@ -49,7 +49,7 @@ export default function App() {
   const [introState, setIntroState] = useState<"open" | "exiting" | "closed">("open")
   const [ckpts, setCkpts] = useState<Checkpoints | null>(null)
   const [error, setError] = useState("")
-  const scrollProgress = useScrollProgress()
+  const progressBarRef = useScrollProgressRef()
 
   const loadCkpts = useCallback(() => {
     setError("")
@@ -66,10 +66,10 @@ export default function App() {
         />
       )}
 
-      {/* Apple Studio 棚拍自然中性光影：纯粹无杂色的冷银/黑曜明暗层次，告别廉价彩色渐变坨 */}
+      {/* Apple Studio 棚拍自然中性光影：静态 GPU 图层，滚动零重绘 */}
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 -z-10"
+        className="pointer-events-none fixed inset-0 -z-10 [transform:translateZ(0)]"
         style={{
           background:
             theme === "dark"
@@ -78,41 +78,42 @@ export default function App() {
         }}
       />
 
-      {/* 视口顶边 2px 液态阅读进度细光带（独立于悬浮胶囊岛，不被圆角裁切） */}
+      {/* 视口顶边 2px 液态阅读进度细光带（纯 GPU transform 驱动，滚动零 React 重渲染） */}
       <div aria-hidden className="pointer-events-none fixed inset-x-0 top-0 z-50 h-[2px] overflow-hidden">
         <div
+          ref={progressBarRef}
           className="h-full w-full origin-left bg-gradient-to-r from-[#0071e3] via-[#5e5ce6] to-[#c946b8] transition-opacity duration-300 dark:from-[#40a5ff] dark:via-[#8b89ff] dark:to-[#f472b6]"
-          style={{
-            transform: `scaleX(${scrollProgress})`,
-            opacity: scrollProgress > 0.005 ? 0.92 : 0,
-          }}
+          style={{ transform: "scaleX(0)", opacity: 0 }}
         />
       </div>
 
       {/* 顶部悬浮液态玻璃导航岛（macOS Tahoe / iOS 26 招牌悬浮胶囊岛） */}
-      <header className="pointer-events-none sticky top-3 z-40 px-4 sm:px-6">
-        <div className="liquid-island pointer-events-auto relative mx-auto flex h-[54px] max-w-[1080px] items-center justify-between gap-4 overflow-hidden rounded-full px-4 sm:px-5">
-          <a href="#" className="group relative z-10 flex items-center gap-2.5 pl-1">
-            <span className="typo-display text-[16px] tracking-[-0.025em] transition-opacity group-hover:opacity-75">
+      <header className="pointer-events-none sticky top-3 z-40 px-3 sm:px-6">
+        <div className="liquid-island pointer-events-auto relative mx-auto flex h-[54px] max-w-[1080px] items-center justify-between gap-2 overflow-hidden rounded-full px-3.5 sm:gap-3 sm:px-5">
+          <a href="#" className="group relative z-10 flex shrink-0 items-center gap-2 pl-1">
+            <span className="typo-display text-[15.5px] tracking-[-0.025em] whitespace-nowrap transition-opacity group-hover:opacity-75 sm:text-[16px]">
               <span className="text-ink font-semibold">Tiny</span>
               <span className="text-ink-3 ml-1 font-normal">LLM</span>
             </span>
             {ckpts && !error && (
-              <span className="text-ink-3 hidden items-center gap-1.5 text-[11.5px] sm:inline-flex">
+              <span
+                title={`${ckpts.items.length} 个模型就绪`}
+                className="text-ink-3 hidden items-center gap-1.5 text-[11.5px] sm:inline-flex"
+              >
                 <span className="relative flex size-1.5">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-65" />
                   <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
                 </span>
-                {ckpts.items.length} 个模型就绪
+                <span className="hidden whitespace-nowrap lg:inline">{ckpts.items.length} 个模型就绪</span>
               </span>
             )}
           </a>
 
-          <div className="relative z-10">
+          <div className="relative z-10 min-w-0">
             <GlideNav items={NAV} ready={ckpts !== null} />
           </div>
 
-          <div className="relative z-10 flex items-center gap-2">
+          <div className="relative z-10 flex shrink-0 items-center gap-1.5 sm:gap-2">
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
@@ -222,7 +223,7 @@ export default function App() {
         <ResultsSection index={4} />
       </main>
 
-      <footer className="border-line border-t bg-surface-alt py-10 backdrop-blur-md">
+      <footer className="border-line border-t bg-surface-alt py-10">
         <div className="text-ink-3 mx-auto flex max-w-[1120px] flex-col justify-between gap-2 px-5 text-[12px] sm:flex-row sm:items-center sm:px-8">
           <span>上海交通大学 计算机科学导论 · B03 从零训练一个迷你语言模型</span>
           <span>Decoder-only Transformer · Built from scratch</span>
