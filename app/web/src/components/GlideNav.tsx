@@ -56,16 +56,16 @@ export function GlideNav({ items, ready = true }: { items: NavItem[]; ready?: bo
       ref={navRef}
       aria-label="页面导航"
       onMouseLeave={() => setHovered(null)}
-      className="no-scrollbar relative flex max-w-full items-center gap-0.5 overflow-x-auto"
+      className="no-scrollbar relative flex max-w-full items-center gap-1 overflow-x-auto"
     >
       <span
         aria-hidden
-        className="liquid-pill pointer-events-none absolute inset-y-0 rounded-full"
+        className="bg-brand pointer-events-none absolute bottom-0 h-[2px] rounded-full"
         style={{
-          left: pill.left,
-          width: pill.width,
+          left: pill.left + 8,
+          width: Math.max(0, pill.width - 16),
           opacity: pill.visible ? 1 : 0,
-          transition: "left 340ms var(--ease-out-strong), width 340ms var(--ease-out-strong), opacity 180ms ease",
+          transition: "left 320ms var(--ease-out-strong), width 320ms var(--ease-out-strong), opacity 180ms ease",
         }}
       />
       {items.map((it, i) => {
@@ -77,7 +77,7 @@ export function GlideNav({ items, ready = true }: { items: NavItem[]; ready?: bo
             href={`#${it.id}`}
             onMouseEnter={() => setHovered(it.id)}
             className={cn(
-              "relative z-10 shrink-0 rounded-full px-2.5 py-1.5 text-[12px] whitespace-nowrap transition-colors duration-200 md:px-3.5 md:text-[12.5px]",
+              "relative z-10 shrink-0 px-2.5 py-2 text-[12.5px] tracking-[0.01em] whitespace-nowrap transition-colors duration-200 md:px-3.5 md:text-[13px]",
               isActive ? "text-ink font-medium" : "text-ink-3 hover:text-ink",
             )}
           >

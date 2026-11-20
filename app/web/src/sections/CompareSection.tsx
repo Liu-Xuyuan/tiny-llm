@@ -11,7 +11,10 @@ import { Composer } from "@/components/Composer"
 import { EMPTY_OUTPUT, type Output } from "@/components/OutputCard"
 import { PixelLoader } from "@/components/PixelLoader"
 import { DEFAULT_PARAMS, SamplingPanel } from "@/components/SamplingPanel"
+import { SamplingVisualizer } from "@/components/SamplingVisualizer"
 import { Section } from "@/components/Section"
+import { Card } from "@/components/ui/card"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { cn } from "@/lib/utils"
 
 // 单张堆叠卡片内部正文 + 底部统计（超出最大可视高度时同样自动上滑显示新内容，保持堆叠卡片优雅定高）
@@ -241,33 +244,38 @@ export function CompareSection({ index, examples }: { index: number; examples: s
           rows={1}
         />
 
-        {/* 可展开采样参数面板 */}
-        <div onPointerMove={onLiquidMove} className="apple-card rounded-[20px]">
-          <button
-            onClick={() => setShowParams((s) => !s)}
-            className="text-ink-2 hover:text-ink flex w-full items-center gap-2.5 px-5 py-3.5 text-[13px] transition-colors"
-          >
-            <SlidersHorizontal className="size-3.5 text-brand" />
-            <span className="font-medium">采样参数</span>
-            <span className="typo-num text-ink-3 truncate text-[12.5px]">{summary}</span>
-            <ChevronDown className={cn("ml-auto size-4 transition-transform duration-300", showParams && "rotate-180")} />
-          </button>
-          <div
-            className="grid transition-[grid-template-rows] duration-300 ease-[var(--ease-out-strong)]"
-            style={{ gridTemplateRows: showParams ? "1fr" : "0fr" }}
-          >
-            <div className="overflow-hidden">
-              <div className="border-line max-w-md border-t px-5 pt-5 pb-6">
+        {/* 可展开采样参数面板：基于标准 Radix Collapsible + Card 双栏对称布局 */}
+        <Card className="overflow-hidden">
+          <Collapsible open={showParams} onOpenChange={setShowParams}>
+            <CollapsibleTrigger asChild>
+              <button
+                type="button"
+                className="text-ink-2 hover:text-ink flex w-full items-center gap-2.5 px-5 py-3.5 text-[13px] transition-colors"
+              >
+                <SlidersHorizontal className="text-brand size-3.5" />
+                <span className="font-medium">采样参数</span>
+                <span className="typo-num text-muted-foreground truncate text-[12.5px]">{summary}</span>
+                <ChevronDown className={cn("ml-auto size-4 transition-transform duration-200", showParams && "rotate-180")} />
+              </button>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="border-border grid gap-6 border-t px-5 pt-5 pb-6 md:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] md:items-start sm:px-6">
                 <SamplingPanel value={params} onChange={setParams} />
+                <div className="space-y-3">
+                  <SamplingVisualizer params={params} />
+                  <p className="text-muted-foreground px-1 text-[11.5px] leading-relaxed">
+                    三组模型共享同一 Prompt、同一采样策略与同一随机种子，确保输出差异仅来自参数规模。
+                  </p>
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
+            </CollapsibleContent>
+          </Collapsible>
+        </Card>
 
         {/* 模型选择器栏 */}
         {models.length > 0 && (
           <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-            <div className="liquid-well inline-flex flex-wrap items-center gap-1 rounded-full p-1">
+            <div className="liquid-well inline-flex flex-wrap items-center gap-1 rounded-[10px] p-1">
               {models.map((m, i) => {
                 const out = outs[i] ?? EMPTY_OUTPUT
                 const badge = getModelBadge(m.run)
@@ -278,7 +286,7 @@ export function CompareSection({ index, examples }: { index: number; examples: s
                     type="button"
                     onClick={() => selectCard(i)}
                     className={cn(
-                      "flex items-center gap-2 rounded-full px-4 py-1.5 text-[13px] transition-all duration-200",
+                      "flex items-center gap-2 rounded-[7px] px-4 py-1.5 text-[13px] transition-all duration-200",
                       isActive ? "liquid-pill text-ink font-semibold" : "text-ink-3 hover:text-ink",
                     )}
                   >
@@ -366,7 +374,7 @@ export function CompareSection({ index, examples }: { index: number; examples: s
                     ].join(", "),
                   }}
                   className={cn(
-                    "apple-card absolute inset-x-0 top-0 origin-top overflow-hidden rounded-[24px] will-change-transform",
+                    "apple-card absolute inset-x-0 top-0 origin-top overflow-hidden rounded-[16px] will-change-transform",
                     isFront
                       ? cn(out.running && "apple-generating")
                       : "cursor-pointer",

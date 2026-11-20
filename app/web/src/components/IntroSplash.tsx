@@ -302,19 +302,19 @@ export function IntroSplash({
           : "rounded-b-none",
       )}
     >
-      {/* 右上角液态玻璃跳过胶囊 */}
+      {/* 右上角跳过按钮 */}
       <button
         type="button"
         onClick={dismiss}
         className={cn(
-          "liquid-pill text-ink-2 hover:text-ink fixed top-6 right-7 z-10 rounded-full px-4 py-1.5 text-[12.5px] font-medium transition-all duration-300 hover:scale-105 active:scale-95",
+          "liquid-pill text-ink-2 hover:text-brand fixed top-6 right-7 z-10 rounded-[9px] px-4 py-1.5 text-[12.5px] font-medium transition-all duration-300 active:scale-95",
           exiting && "opacity-0",
         )}
       >
         跳过
       </button>
 
-      {/* 无边框纯净舞台：退场时内容带轻微上浮视差淡出，配合整块幕布上滑揭开主页 */}
+      {/* 暖宣纸出版舞台：退场时内容带轻微上浮视差淡出，配合整块幕布上滑揭开主页 */}
       <div
         ref={stageRef}
         className={cn(
@@ -322,19 +322,19 @@ export function IntroSplash({
           exiting && "-translate-y-8 opacity-0",
         )}
       >
-        {/* 唯一一支 120fps GPU 悬空 Apple Pencil（定位原点精准对齐笔尖） */}
+        {/* 唯一一支 120fps GPU 悬空蘸水/书画笔（定位原点精准对齐笔尖） */}
         <div
           ref={penRef}
           aria-hidden
           className="pointer-events-none absolute top-0 left-0 z-20 will-change-transform"
           style={{ opacity: 0 }}
         >
-          <span className="nib-glow absolute -top-[4px] -left-[4px] size-2.5 rounded-full bg-gradient-to-tr from-brand via-indigo-400 to-fuchsia-400 blur-[3px]" />
+          <span className="nib-glow bg-brand absolute -top-[4px] -left-[4px] size-2.5 rounded-full blur-[3px]" />
           <svg
             ref={penSvgRef}
             viewBox="0 0 40 40"
             fill="none"
-            className="absolute -left-[8px] -top-[30px] size-10 origin-[8px_30px] drop-shadow-[0_6px_14px_rgba(0,0,0,0.16)] dark:drop-shadow-[0_6px_16px_rgba(0,0,0,0.55)]"
+            className="absolute -left-[8px] -top-[30px] size-10 origin-[8px_30px] drop-shadow-[0_6px_14px_rgba(25,23,21,0.16)] dark:drop-shadow-[0_6px_16px_rgba(0,0,0,0.6)]"
           >
             <defs>
               <linearGradient id="pencilShaft" x1="10" y1="30" x2="34" y2="6" gradientUnits="userSpaceOnUse">
@@ -356,7 +356,11 @@ export function IntroSplash({
           </svg>
         </div>
 
-        <p className="typo-kicker text-ink-3 mb-8">SJTU · Topic B03 · Tiny LLM</p>
+        <p className="typo-kicker text-ink-3 mb-8 flex items-center justify-center gap-3">
+          <span aria-hidden className="bg-line-strong h-px w-6" />
+          <span>PROLOGUE · SJTU TOPIC B03 · TINY LLM</span>
+          <span aria-hidden className="bg-line-strong h-px w-6" />
+        </p>
 
         <h1 className="typo-editorial text-ink text-[34px] leading-[1.28] font-normal tracking-[-0.02em] text-balance sm:text-[52px]">
           <span ref={promptRef} className="apple-ai-text pr-0.5 font-medium italic">

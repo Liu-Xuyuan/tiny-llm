@@ -46,7 +46,7 @@ export function GenerateSection({ index, ckpts, reload }: { index: number; ckpts
         <ModelStats stats={stats} />
 
         <div className="grid gap-5 lg:grid-cols-[300px_minmax(0,1fr)]">
-          <div onPointerMove={onLiquidMove} className="apple-card flex flex-col justify-between space-y-6 rounded-[22px] p-6 lg:min-h-[548px]">
+          <div onPointerMove={onLiquidMove} className="apple-card flex flex-col justify-between space-y-6 rounded-[14px] p-6 lg:min-h-[548px]">
             <div className="space-y-6">
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between">

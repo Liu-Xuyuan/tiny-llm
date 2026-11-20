@@ -32,24 +32,20 @@ export function Section({ id, index, eyebrow, title, desc, aside, children, tint
       <div className="mx-auto max-w-[1120px] px-5 sm:px-8">
         <div
           className={cn(
-            "scroll-item mb-8 flex flex-col justify-between gap-4 sm:mb-10 sm:flex-row sm:items-end",
+            "scroll-item mb-9 flex flex-col justify-between gap-5 sm:mb-11 sm:flex-row sm:items-end",
             visible && "is-visible",
           )}
         >
           <div className="max-w-2xl">
-            <p className="typo-kicker text-ink-3 mb-2.5 flex items-center gap-2">
-              <span className="text-brand">{String(index + 1).padStart(2, "0")}</span>
-              {eyebrow && (
-                <>
-                  <span className="opacity-40">/</span>
-                  <span>{eyebrow}</span>
-                </>
-              )}
-            </p>
-            <h2 className="typo-display text-ink text-[30px] leading-[1.12] font-semibold tracking-[-0.032em] sm:text-[38px]">
+            <div className="typo-kicker text-ink-3 mb-3 flex items-center gap-2.5">
+              <span className="typo-num text-brand font-semibold">{String(index + 1).padStart(2, "0")}</span>
+              <span aria-hidden className="bg-line-strong h-px w-6" />
+              {eyebrow && <span>{eyebrow}</span>}
+            </div>
+            <h2 className="typo-display text-ink text-[32px] leading-[1.12] font-semibold tracking-[-0.025em] sm:text-[42px]">
               {title}
             </h2>
-            <p className="text-ink-3 mt-3 max-w-[54ch] text-[15px] leading-[1.7] text-pretty sm:text-[16.5px]">
+            <p className="text-ink-3 mt-3 max-w-[54ch] text-[15px] leading-[1.72] text-pretty sm:text-[16px]">
               {desc}
             </p>
           </div>

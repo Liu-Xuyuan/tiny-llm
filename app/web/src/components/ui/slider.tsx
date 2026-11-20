@@ -57,13 +57,13 @@ function Slider({
       <SliderPrimitive.Track
         data-slot="slider-track"
         className={cn(
-          "relative grow overflow-hidden rounded-full bg-black/8 dark:bg-white/14 data-[orientation=horizontal]:h-[5px] data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1.5"
+          "relative grow overflow-hidden rounded-full bg-ink/12 data-[orientation=horizontal]:h-[4px] data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1.5"
         )}
       >
         <SliderPrimitive.Range
           data-slot="slider-range"
           className={cn(
-            "absolute bg-gradient-to-r from-[#0071e3] to-[#3b9cff] data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full"
+            "absolute bg-brand data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full"
           )}
         />
       </SliderPrimitive.Track>
@@ -71,7 +71,7 @@ function Slider({
         <SliderPrimitive.Thumb
           data-slot="slider-thumb"
           key={index}
-          className="liquid-thumb block size-4.5 shrink-0 rounded-full transition-[transform,background-color,box-shadow] duration-200 ease-[var(--ease-spring)] hover:scale-110 active:scale-x-125 active:scale-y-110 focus-visible:ring-3 focus-visible:ring-brand/30 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50"
+          className="liquid-thumb block size-4 shrink-0 rounded-full transition-[transform,background-color,border-color,box-shadow] duration-200 ease-[var(--ease-spring)] hover:scale-110 active:scale-115 focus-visible:ring-3 focus-visible:ring-brand/30 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50"
         />
       ))}
     </SliderPrimitive.Root>

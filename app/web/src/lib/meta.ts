@@ -22,9 +22,9 @@ const MODEL_STYLES: Record<string, ModelBadge> = {
   },
   s100m: {
     tag: "0.10B",
-    dot: "bg-violet-500",
-    pill: "bg-violet-500/12 text-violet-700 dark:text-violet-300 ring-violet-500/25",
-    bar: "from-violet-500 to-fuchsia-500",
+    dot: "bg-[#0071e3] dark:bg-[#2997ff]",
+    pill: "bg-[#0071e3]/12 text-[#0071e3] dark:text-[#2997ff] ring-[#0071e3]/25",
+    bar: "from-[#0071e3] to-[#5e5ce6]",
   },
 }
 

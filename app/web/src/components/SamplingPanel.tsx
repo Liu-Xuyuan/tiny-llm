@@ -5,6 +5,9 @@ import { Dices } from "lucide-react"
 
 import type { SamplingParams } from "@/lib/api"
 import { Segmented } from "@/components/Segmented"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Separator } from "@/components/ui/separator"
 import { Slider } from "@/components/ui/slider"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
@@ -38,24 +41,44 @@ const LENGTH_SLIDER: SliderDef = {
   show: (v) => `${v} tok`,
 }
 
-function SliderRow({ s, value, onChange }: { s: SliderDef; value: number; onChange: (v: number) => void }) {
+function SliderRow({
+  s,
+  value,
+  onChange,
+  compact = false,
+}: {
+  s: SliderDef
+  value: number
+  onChange: (v: number) => void
+  compact?: boolean
+}) {
   return (
-    <div className="space-y-2.5">
-      <div className="flex items-center justify-between text-[13px]">
+    <div className={compact ? "space-y-1.5" : "space-y-2.5"}>
+      <div className={cn("flex items-center justify-between", compact ? "text-[12px]" : "text-[13px]")}>
         <Tooltip>
           <TooltipTrigger asChild>
             <span className="text-ink-2 cursor-help font-medium">{s.label}</span>
           </TooltipTrigger>
-          <TooltipContent side="right" className="max-w-60">{s.tip}</TooltipContent>
+          <TooltipContent side="left" className="max-w-60">{s.tip}</TooltipContent>
         </Tooltip>
-        <span className="typo-num text-ink-3 text-[12.5px] font-medium">{s.show(value)}</span>
+        <span className={cn("typo-num text-ink-3 font-medium", compact ? "text-[11.5px]" : "text-[12.5px]")}>
+          {s.show(value)}
+        </span>
       </div>
       <Slider min={s.min} max={s.max} step={s.step} value={[value]} onValueChange={([v]) => onChange(v)} />
     </div>
   )
 }
 
-export function SamplingPanel({ value, onChange }: { value: SamplingParams; onChange: (v: SamplingParams) => void }) {
+export function SamplingPanel({
+  value,
+  onChange,
+  compact = false,
+}: {
+  value: SamplingParams
+  onChange: (v: SamplingParams) => void
+  compact?: boolean
+}) {
   const set = (patch: Partial<SamplingParams>) => onChange({ ...value, ...patch })
   const current = (Object.keys(PRESETS) as Preset[]).find((k) => {
     const v = PRESETS[k].v
@@ -63,9 +86,9 @@ export function SamplingPanel({ value, onChange }: { value: SamplingParams; onCh
   }) ?? null
 
   return (
-    <div className="space-y-5">
+    <div className={compact ? "flex h-full flex-col justify-between gap-3" : "space-y-5"}>
       {/* 采样策略组：预设按钮与下方三条滑块严格对应联动 */}
-      <div className="space-y-5">
+      <div className={compact ? "flex flex-1 flex-col justify-between gap-3" : "space-y-5"}>
         <Segmented
           size="sm"
           className="flex w-full"
@@ -74,28 +97,29 @@ export function SamplingPanel({ value, onChange }: { value: SamplingParams; onCh
           options={(Object.keys(PRESETS) as Preset[]).map((k) => ({ value: k, label: PRESETS[k].label, title: PRESETS[k].title }))}
         />
 
-        <div className="space-y-5">
+        <div className={compact ? "flex flex-1 flex-col justify-evenly gap-2.5" : "space-y-5"}>
           {STRATEGY_SLIDERS.map((s) => (
-            <SliderRow key={s.key} s={s} value={value[s.key]} onChange={(v) => set({ [s.key]: v })} />
+            <SliderRow key={s.key} s={s} value={value[s.key]} onChange={(v) => set({ [s.key]: v })} compact={compact} />
           ))}
         </div>
       </div>
 
       {/* 独立输出控制组：生成长度与随机种子不随采样预设重置 */}
-      <div className="border-line space-y-5 border-t pt-5">
-        <SliderRow s={LENGTH_SLIDER} value={value.max_new_tokens} onChange={(v) => set({ max_new_tokens: v })} />
+      <div className={compact ? "space-y-3" : "space-y-5"}>
+        <Separator />
+        <SliderRow s={LENGTH_SLIDER} value={value.max_new_tokens} onChange={(v) => set({ max_new_tokens: v })} compact={compact} />
 
-        <div className="flex items-center justify-between gap-3 text-[13px]">
+        <div className={cn("flex items-center justify-between gap-3", compact ? "text-[12px]" : "text-[13px]")}>
           <Tooltip>
             <TooltipTrigger asChild>
               <span className="text-ink-2 cursor-help font-medium">Seed</span>
             </TooltipTrigger>
-            <TooltipContent side="right" className="max-w-60">
+            <TooltipContent side="left" className="max-w-60">
               随机种子：固定数字可复现同一结果；点右侧骰子可在「每次随机」与「固定 42」之间一键切换
             </TooltipContent>
           </Tooltip>
-          <div className="liquid-well flex h-8 items-center rounded-full pl-3.5 pr-1">
-            <input
+          <div className="flex items-center gap-1.5">
+            <Input
               type="number"
               value={value.seed === -1 ? "" : value.seed}
               placeholder="随机"
@@ -104,21 +128,23 @@ export function SamplingPanel({ value, onChange }: { value: SamplingParams; onCh
                 const raw = e.target.value.trim()
                 set({ seed: raw === "" ? -1 : Number.parseInt(raw, 10) })
               }}
-              className="typo-num text-ink placeholder:text-brand w-20 bg-transparent text-[13px] font-medium outline-none placeholder:font-medium [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+              className={cn(
+                "typo-num placeholder:text-brand font-medium [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none",
+                compact ? "h-7 w-18 text-[12px]" : "h-8 w-20 text-[12.5px]",
+              )}
             />
             <Tooltip>
               <TooltipTrigger asChild>
-                <button
+                <Button
                   type="button"
+                  variant={value.seed === -1 ? "default" : "outline"}
+                  size={compact ? "icon-xs" : "icon-sm"}
                   onClick={() => set({ seed: value.seed === -1 ? 42 : -1 })}
                   aria-label={value.seed === -1 ? "切回固定 seed 42" : "切换为每次随机 seed"}
-                  className={cn(
-                    "hover:text-ink flex size-6.5 items-center justify-center rounded-full transition-all active:scale-90",
-                    value.seed === -1 ? "bg-brand text-white hover:text-white" : "text-ink-3",
-                  )}
+                  className={compact ? "size-7" : undefined}
                 >
                   <Dices className="size-3.5" />
-                </button>
+                </Button>
               </TooltipTrigger>
               <TooltipContent>
                 {value.seed === -1 ? "当前每次随机，点击切回固定 42" : "点击切换为每次随机（生成后显示实际 Seed）"}

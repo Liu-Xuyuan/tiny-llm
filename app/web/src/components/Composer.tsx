@@ -1,7 +1,8 @@
-// Apple 风格输入框：大圆角纯净卡片 + 经典苹果蓝主胶囊按钮 + 柔和示例胶囊
+// 提示词输入区：基于标准 shadcn/ui Card + Button 构建
 import { ArrowUp, Square, X } from "lucide-react"
 
-import { onLiquidMove } from "@/lib/motion"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 
 type Props = {
@@ -17,8 +18,8 @@ type Props = {
 
 export function Composer({ value, onChange, onSubmit, onStop, running, examples, submitLabel = "生成", rows = 2 }: Props) {
   return (
-    <div className="space-y-3.5">
-      <div onPointerMove={onLiquidMove} className="apple-card focus-within:ring-2 focus-within:ring-brand/35 rounded-[22px] transition-shadow duration-200">
+    <div className="space-y-3">
+      <Card className="focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/20 transition-shadow">
         <div className="relative">
           <textarea
             value={value}
@@ -31,57 +32,50 @@ export function Composer({ value, onChange, onSubmit, onStop, running, examples,
                 if (!running && value.trim()) onSubmit()
               }
             }}
-            className="typo-editorial text-ink placeholder:text-ink-3 block w-full resize-none bg-transparent pt-5 pr-11 pl-5 text-[17.5px] leading-relaxed outline-none placeholder:italic"
+            className="typo-editorial text-ink placeholder:text-muted-foreground block w-full resize-none bg-transparent pt-4 pr-11 pl-4 text-[17px] leading-relaxed outline-none placeholder:italic"
           />
           {value && !running && (
-            <button
-              type="button"
+            <Button
+              variant="ghost"
+              size="icon-xs"
               onClick={() => onChange("")}
               title="清空输入"
-              className="text-ink-3 hover:bg-field hover:text-ink absolute top-4 right-4 flex size-7 items-center justify-center rounded-full transition-colors"
+              className="absolute top-3.5 right-3.5 size-7"
             >
               <X className="size-3.5" />
-            </button>
+            </Button>
           )}
         </div>
 
-        <div className="flex items-center justify-between gap-3 px-5 pt-2 pb-4">
-          <span className="text-ink-3 text-[12px]">Enter 生成 · Shift+Enter 换行</span>
-          <button
-            type="button"
+        <div className="flex items-center justify-between gap-3 px-4 pt-1.5 pb-3.5">
+          <span className="text-muted-foreground text-[12px]">Enter 生成 · Shift+Enter 换行</span>
+          <Button
+            variant={running ? "destructive" : "default"}
+            size="sm"
             onClick={running ? onStop : onSubmit}
             disabled={!running && !value.trim()}
-            className={cn(
-              "group flex h-9 items-center gap-1.5 rounded-full px-4.5 text-[13.5px] font-medium transition-all duration-150 disabled:pointer-events-none disabled:opacity-35",
-              running
-                ? "bg-destructive/12 text-destructive hover:bg-destructive/18 active:scale-[0.97]"
-                : "btn-apple",
-            )}
+            className="h-8.5 px-4"
           >
-            {running ? <Square className="size-3 fill-current" /> : <ArrowUp className="size-4 transition-transform duration-200 group-hover:-translate-y-0.5" />}
+            {running ? <Square className="size-3 fill-current" /> : <ArrowUp className="size-3.5" />}
             {running ? "停止" : submitLabel}
-          </button>
+          </Button>
         </div>
-      </div>
+      </Card>
 
       {examples.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-1.5">
           {examples.map((ex) => {
             const selected = value.trim() === ex
             return (
-              <button
+              <Button
                 key={ex}
-                type="button"
+                variant={selected ? "default" : "outline"}
+                size="sm"
                 onClick={() => onChange(ex)}
-                className={cn(
-                  "h-8 rounded-full px-3.5 text-[12.5px] transition-all duration-200 ease-[var(--ease-spring)] hover:-translate-y-0.5 active:scale-[0.95]",
-                  selected
-                    ? "btn-apple font-medium"
-                    : "liquid-pill text-ink-2 hover:text-ink",
-                )}
+                className={cn("h-7.5 px-3 text-[12px]", !selected && "font-normal")}
               >
                 {ex}
-              </button>
+              </Button>
             )
           })}
         </div>

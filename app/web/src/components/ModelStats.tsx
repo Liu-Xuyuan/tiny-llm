@@ -57,7 +57,7 @@ export function ModelStats({ stats }: { stats: Stats | null }) {
   return (
     <div
       onPointerMove={onLiquidMove}
-      className="apple-card divide-line grid grid-cols-2 divide-x divide-y overflow-hidden rounded-[22px] sm:grid-cols-[1.4fr_1fr_0.92fr_1fr_0.92fr] sm:divide-y-0"
+      className="apple-card divide-line grid grid-cols-2 divide-x divide-y overflow-hidden rounded-[14px] sm:grid-cols-[1.4fr_1fr_0.92fr_1fr_0.92fr] sm:divide-y-0"
     >
       {stats
         ? items.map(([k, node, sub], idx) => (

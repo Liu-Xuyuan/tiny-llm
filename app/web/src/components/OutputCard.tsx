@@ -82,7 +82,7 @@ export function OutputCard({
     <div
       onPointerMove={onLiquidMove}
       className={cn(
-        "apple-card group/out relative flex min-h-60 flex-col overflow-hidden rounded-[22px] p-6 transition-shadow duration-500 sm:p-7",
+        "apple-card group/out relative flex min-h-60 flex-col overflow-hidden rounded-[14px] p-6 transition-shadow duration-500 sm:p-7",
         out.running && "apple-generating",
         className,
       )}
