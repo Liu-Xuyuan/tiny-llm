@@ -31,7 +31,7 @@ export function Composer({ value, onChange, onSubmit, onStop, running, examples,
                 if (!running && value.trim()) onSubmit()
               }
             }}
-            className="text-ink placeholder:text-ink-3 block w-full resize-none bg-transparent pt-5 pr-11 pl-5 text-[16px] leading-relaxed outline-none"
+            className="typo-editorial text-ink placeholder:text-ink-3 block w-full resize-none bg-transparent pt-5 pr-11 pl-5 text-[17.5px] leading-relaxed outline-none placeholder:italic"
           />
           {value && !running && (
             <button

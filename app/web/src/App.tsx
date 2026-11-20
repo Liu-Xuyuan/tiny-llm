@@ -46,7 +46,7 @@ function useTheme(): [Theme, (t: Theme) => void] {
 
 export default function App() {
   const [theme, setTheme] = useTheme()
-  const [showIntro, setShowIntro] = useState(true)
+  const [introState, setIntroState] = useState<"open" | "exiting" | "closed">("open")
   const [ckpts, setCkpts] = useState<Checkpoints | null>(null)
   const [error, setError] = useState("")
   const scrollProgress = useScrollProgress()
@@ -59,7 +59,12 @@ export default function App() {
 
   return (
     <TooltipProvider delayDuration={200}>
-      {showIntro && <IntroSplash onDone={() => setShowIntro(false)} />}
+      {introState !== "closed" && (
+        <IntroSplash
+          onStartExit={() => setIntroState("exiting")}
+          onDone={() => setIntroState("closed")}
+        />
+      )}
 
       {/* Apple Studio 棚拍自然中性光影：纯粹无杂色的冷银/黑曜明暗层次，告别廉价彩色渐变坨 */}
       <div
@@ -88,8 +93,9 @@ export default function App() {
       <header className="pointer-events-none sticky top-3 z-40 px-4 sm:px-6">
         <div className="liquid-island pointer-events-auto relative mx-auto flex h-[54px] max-w-[1080px] items-center justify-between gap-4 overflow-hidden rounded-full px-4 sm:px-5">
           <a href="#" className="group relative z-10 flex items-center gap-2.5 pl-1">
-            <span className="text-ink text-[15.5px] font-semibold tracking-[-0.02em] transition-opacity group-hover:opacity-75">
-              Tiny LLM
+            <span className="typo-display text-[16px] tracking-[-0.025em] transition-opacity group-hover:opacity-75">
+              <span className="text-ink font-semibold">Tiny</span>
+              <span className="text-ink-3 ml-1 font-normal">LLM</span>
             </span>
             {ckpts && !error && (
               <span className="text-ink-3 hidden items-center gap-1.5 text-[11.5px] sm:inline-flex">
@@ -111,7 +117,7 @@ export default function App() {
               <TooltipTrigger asChild>
                 <button
                   type="button"
-                  onClick={() => setShowIntro(true)}
+                  onClick={() => setIntroState("open")}
                   aria-label="重播开场动画"
                   className="liquid-pill text-ink-2 hover:text-ink flex size-8 items-center justify-center rounded-full transition-all duration-200 hover:scale-105 active:scale-95"
                 >
@@ -134,26 +140,37 @@ export default function App() {
         </div>
       </header>
 
-      <main className="relative min-h-screen">
+      <main
+        className="relative min-h-screen"
+        style={
+          introState === "closed"
+            ? undefined
+            : {
+                transform: introState === "open" ? "translate3d(0, 28px, 0) scale(0.985)" : "translate3d(0, 0, 0) scale(1)",
+                opacity: introState === "open" ? 0.45 : 1,
+                transition: "transform 820ms cubic-bezier(0.22, 1, 0.36, 1), opacity 680ms ease",
+              }
+        }
+      >
         {/* Hero 首屏 */}
         <section className="relative">
           <div className="relative z-10 mx-auto max-w-[1120px] px-5 pt-18 pb-16 text-center sm:px-8 sm:pt-26 sm:pb-24">
-            <p className="reveal liquid-pill text-ink-2 mx-auto inline-flex items-center rounded-full px-3.5 py-1 text-[12px] font-medium tracking-[0.03em]">
-              上海交通大学 · 计算机科学导论 · Topic B03
+            <p className="reveal liquid-pill typo-kicker text-ink-2 mx-auto inline-flex items-center rounded-full px-4 py-1.5">
+              SJTU · 计算机科学导论 · Topic B03
             </p>
             <h1
-              className="reveal text-ink mx-auto mt-6 max-w-3xl text-[38px] leading-[1.08] font-semibold tracking-[-0.038em] text-balance sm:text-[62px]"
+              className="reveal typo-display mx-auto mt-7 max-w-3xl text-[40px] leading-[1.1] tracking-[-0.036em] sm:text-[66px]"
               style={{ animationDelay: "60ms" }}
             >
-              从零训练的
+              <span className="text-ink-2 font-medium tracking-[-0.024em]">从零训练的</span>
               <br />
-              <span className="apple-ai-text">迷你语言模型</span>
+              <span className="apple-ai-text font-bold tracking-[-0.044em]">迷你语言模型</span>
             </h1>
             <p
-              className="reveal text-ink-3 mx-auto mt-6 max-w-2xl text-[17px] leading-[1.55] font-normal tracking-[-0.012em] text-pretty sm:text-[21px]"
+              className="reveal text-ink-3 mx-auto mt-6 max-w-[46ch] text-[17px] leading-[1.65] font-normal tracking-[0.005em] text-pretty sm:text-[20px]"
               style={{ animationDelay: "120ms" }}
             >
-              手写 Decoder-only Transformer，用 next-token prediction 完整实现预训练、自回归生成与多规模对照实验。
+              手写 Decoder-only Transformer，以 next-token prediction 完整实现预训练、自回归生成与多规模对照实验。
             </p>
 
             <div
@@ -175,16 +192,16 @@ export default function App() {
               </a>
             </div>
 
-            {/* 液态玻璃四列核心规格条 */}
+            {/* 液态玻璃四列核心规格条：为第 4 列语料名分配充裕宽度，彻底告别贴边拥挤 */}
             <dl
               onPointerMove={onLiquidMove}
-              className="reveal apple-card divide-line mx-auto mt-14 grid max-w-4xl grid-cols-2 divide-x divide-y overflow-hidden rounded-[24px] sm:grid-cols-4 sm:divide-y-0"
+              className="reveal apple-card divide-line mx-auto mt-14 grid max-w-4xl grid-cols-2 divide-x divide-y overflow-hidden rounded-[24px] sm:grid-cols-[1fr_0.9fr_0.8fr_1.45fr] sm:divide-y-0"
               style={{ animationDelay: "240ms" }}
             >
               {HERO_SPECS.map(([val, label]) => (
-                <div key={label} className="px-4 py-5 transition-colors duration-200 hover:bg-white/25 dark:hover:bg-white/5">
-                  <dt className="text-ink text-[15px] font-semibold tracking-[-0.015em] whitespace-nowrap sm:text-[17px]">{val}</dt>
-                  <dd className="text-ink-3 mt-1 text-[12px]">{label}</dd>
+                <div key={label} className="px-6 py-5 transition-colors duration-200 hover:bg-white/25 dark:hover:bg-white/5">
+                  <dt className="typo-display typo-num text-ink text-[15.5px] font-semibold tracking-[-0.02em] whitespace-nowrap sm:text-[17px]">{val}</dt>
+                  <dd className="text-ink-3 mt-1.5 text-[12px] tracking-[0.01em]">{label}</dd>
                 </div>
               ))}
             </dl>

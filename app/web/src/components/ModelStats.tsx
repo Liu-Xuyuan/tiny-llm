@@ -1,16 +1,53 @@
-// 模型核心规格条（Apple Tech Specs 大数字风格）：切换模型时五格数字依次错峰弹性翻新
+// 模型核心规格条（Apple Mac Studio 规格表级数字雕塑）：主数值锐利加粗、单位与斜杠轻灰退让
+import type { ReactNode } from "react"
+
 import { fmtM, type ModelStats as Stats } from "@/lib/api"
 import { onLiquidMove } from "@/lib/motion"
 import { Skeleton } from "@/components/ui/skeleton"
 
+function StatNumber({ value, unit }: { value: string; unit?: string }) {
+  return (
+    <span className="typo-display typo-num inline-flex items-baseline gap-0.5">
+      <span className="text-ink text-[24px] leading-none font-semibold tracking-[-0.03em]">{value}</span>
+      {unit && <span className="text-ink-3 text-[13px] font-medium tracking-normal">{unit}</span>}
+    </span>
+  )
+}
+
 export function ModelStats({ stats }: { stats: Stats | null }) {
-  const items: [string, string, string][] = stats
+  const items: [string, ReactNode, string][] = stats
     ? [
-        ["模型结构", `${stats.n_layer}/${stats.n_embd}/${stats.n_head}`, "层 / 维 / 头"],
-        ["总参数量", fmtM(stats.params), `非 emb ${fmtM(stats.params_non_emb)}`],
-        ["分词词表", `${stats.vocab_size}`, stats.tokenizer.replace("Tokenizer", "")],
-        ["训练 Token", fmtM(stats.tokens, 0), `${stats.iters} 步`],
-        ["Val Loss", stats.best_val.toFixed(3), `上下文 ${stats.block_size}`],
+        [
+          "模型结构",
+          <span key="arch" className="typo-display typo-num inline-flex items-baseline text-[22px] leading-none font-semibold tracking-[-0.025em]">
+            <span className="text-ink">{stats.n_layer}</span>
+            <span className="text-ink-3/50 mx-1 text-[16px] font-light">/</span>
+            <span className="text-ink">{stats.n_embd}</span>
+            <span className="text-ink-3/50 mx-1 text-[16px] font-light">/</span>
+            <span className="text-ink">{stats.n_head}</span>
+          </span>,
+          "层 / 维 / 头",
+        ],
+        [
+          "总参数量",
+          <StatNumber key="p" value={(stats.params / 1e6).toFixed(1)} unit="M" />,
+          `非 emb ${fmtM(stats.params_non_emb)}`,
+        ],
+        [
+          "分词词表",
+          <StatNumber key="v" value={stats.vocab_size.toLocaleString("en-US")} />,
+          stats.tokenizer.replace("Tokenizer", ""),
+        ],
+        [
+          "训练 Token",
+          <StatNumber key="t" value={(stats.tokens / 1e6).toFixed(0)} unit="M" />,
+          `${stats.iters.toLocaleString("en-US")} 步`,
+        ],
+        [
+          "Val Loss",
+          <StatNumber key="l" value={stats.best_val.toFixed(3)} />,
+          `上下文 ${stats.block_size}`,
+        ],
       ]
     : []
 
@@ -20,17 +57,15 @@ export function ModelStats({ stats }: { stats: Stats | null }) {
       className="apple-card divide-line grid grid-cols-2 divide-x divide-y overflow-hidden rounded-[22px] sm:grid-cols-5 sm:divide-y-0"
     >
       {stats
-        ? items.map(([k, v, sub], idx) => (
+        ? items.map(([k, node, sub], idx) => (
             <div
               key={`${stats.ckpt}-${k}`}
-              className="stat-pop hover:bg-field/60 px-5 py-4 transition-colors duration-200 sm:py-5"
+              className="stat-pop hover:bg-field/60 px-5 py-4.5 transition-colors duration-200 sm:py-5"
               style={{ animationDelay: `${idx * 45}ms` }}
             >
-              <div className="text-ink-3 text-[12px] font-medium">{k}</div>
-              <div className="text-ink mt-1.5 text-[22px] leading-none font-semibold tracking-[-0.025em] tabular-nums">
-                {v}
-              </div>
-              <div className="text-ink-3 mt-1.5 truncate text-[11.5px]">{sub}</div>
+              <div className="text-ink-3 text-[11.5px] font-medium tracking-[0.01em]">{k}</div>
+              <div className="mt-2">{node}</div>
+              <div className="typo-num text-ink-3 mt-2 truncate text-[11.5px]">{sub}</div>
             </div>
           ))
         : Array.from({ length: 5 }, (_, i) => (

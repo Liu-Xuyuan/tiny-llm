@@ -93,8 +93,10 @@
 }
 
 @theme inline {
-  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter Variable", "Noto Sans SC Variable", "PingFang SC", "Helvetica Neue", sans-serif;
-  --font-mono: "SF Mono", "JetBrains Mono Variable", ui-monospace, Menlo, Consolas, monospace;
+  --font-display: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Inter Variable", "Noto Sans SC Variable", "PingFang SC", "Helvetica Neue", sans-serif;
+  --font-sans: "SF Pro Text", -apple-system, BlinkMacSystemFont, "Inter Variable", "Noto Sans SC Variable", "PingFang SC", "Helvetica Neue", sans-serif;
+  --font-serif: "New York", ui-serif, "Iowan Old Style", "Palatino Linotype", Georgia, "Songti SC", serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono Variable", Menlo, Consolas, monospace;
   --ease-out-strong: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-spring: cubic-bezier(0.34, 1.32, 0.64, 1);
   --color-page: var(--page);
@@ -145,8 +147,46 @@
   html { scroll-behavior: smooth; }
   body {
     @apply bg-page text-ink font-sans antialiased;
+    font-optical-sizing: auto;
+    font-kerning: normal;
+    text-autospace: normal;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* ------------------------------------------------------------------ Apple 三重排印人格（Display / Editorial Serif / Precision Mono） */
+@layer components {
+  /* 展示级大标题：SF Pro Display + 光学尺寸 + 精致字偶距 */
+  .typo-display {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-feature-settings: "kern" 1, "cv11" 1, "ss01" 1;
+    text-wrap: balance;
+  }
+
+  /* Apple Books 文学衬线体：用于开场故事与模型生成文本，呈现精装书页质感 */
+  .typo-editorial {
+    font-family: var(--font-serif);
+    font-optical-sizing: auto;
+    font-feature-settings: "kern" 1, "liga" 1, "dlig" 0;
+  }
+
+  /* Apple 官网风宽字距无衬线眉标（告别程序员终端字体） */
+  .typo-kicker {
+    font-family: var(--font-sans);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* 苹果级清晰等宽数字：严格对齐，且保持纯正圆润的 0（无黑点、无斜杠） */
+  .typo-num {
+    font-family: var(--font-sans);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
   }
 }
 
@@ -416,6 +456,15 @@
     0 0 0 1px rgba(255, 255, 255, 0.35);
 }
 
+/* 开场动画单字柔和显墨：预先占位不抖动，笔尖划过即温润浮现 */
+.ink-char {
+  opacity: 0;
+  transition: opacity 280ms ease-out;
+}
+.ink-char.ink-shown {
+  opacity: 1;
+}
+
 @keyframes pen-write {
   0%, 100% { transform: rotate(-3deg) translateY(0px); }
   40% { transform: rotate(2.8deg) translateY(-2px); }
@@ -463,6 +512,31 @@
   *, ::before, ::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
   .scroll-item { opacity: 1; transform: none; }
   html { scroll-behavior: auto; }
+}
+
+/* ------------------------------------------------------------------ Apple 极简细滚动条与顶部渐隐遮罩 */
+.apple-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(128, 128, 134, 0.35) transparent;
+}
+.apple-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.apple-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.apple-scroll::-webkit-scrollbar-thumb {
+  background: rgba(128, 128, 134, 0.32);
+  border-radius: 999px;
+}
+.apple-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(128, 128, 134, 0.52);
+}
+
+/* 当正文向上卷动时，顶部柔和淡出（类似 Apple Music 歌词 / iOS 滚动容器） */
+.scroll-fade-top {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 28px, #000 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 28px, #000 100%);
 }
 
 /* ------------------------------------------------------------------ Apple Tech Specs 风格结果表 */

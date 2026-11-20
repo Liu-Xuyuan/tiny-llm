@@ -18,7 +18,7 @@ export function PixelLoader({ label = "生成中" }: { label?: string }) {
         {DELAYS.map((d, i) => <span key={i} className="pixel bg-brand size-[4.5px] rounded-[1.5px]" style={{ animationDelay: `${d}ms` }} />)}
       </span>
       <span className="shimmer text-[13px] font-medium">{label}</span>
-      <span className="text-ink-3 font-mono text-[12px] tabular-nums">{elapsed.toFixed(1)}s</span>
+      <span className="typo-num text-ink-3 text-[12.5px]">{elapsed.toFixed(1)}s</span>
     </div>
   )
 }

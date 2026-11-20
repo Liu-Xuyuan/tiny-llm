@@ -1,4 +1,4 @@
-// 章节容器：极轻透的半透明层次交替铺陈，让底层液态光场自然透过每张液态玻璃卡片，并随滚动错峰淡入上浮
+// 章节容器：极轻透层次交替铺陈 + 瑞士/苹果风精密眉标与雕塑级主标题 + 滚动错峰渐显
 import type { ReactNode } from "react"
 
 import { useInView } from "@/lib/motion"
@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils"
 type Props = {
   id: string
   index: number
+  eyebrow?: string
   title: string
   desc: string
   aside?: ReactNode
@@ -15,7 +16,7 @@ type Props = {
   surfaceClassName?: string
 }
 
-export function Section({ id, index, title, desc, aside, children, tinted, surfaceClassName }: Props) {
+export function Section({ id, index, eyebrow, title, desc, aside, children, tinted, surfaceClassName }: Props) {
   const useTinted = tinted ?? index % 2 === 0
   const { ref, visible } = useInView<HTMLElement>(0.05)
 
@@ -36,13 +37,21 @@ export function Section({ id, index, title, desc, aside, children, tinted, surfa
           )}
         >
           <div className="max-w-2xl">
-            <p className="text-ink-3 mb-2 font-mono text-[12px] font-medium tracking-[0.04em]">
-              {String(index + 1).padStart(2, "0")}
+            <p className="typo-kicker text-ink-3 mb-2.5 flex items-center gap-2">
+              <span className="text-brand">{String(index + 1).padStart(2, "0")}</span>
+              {eyebrow && (
+                <>
+                  <span className="opacity-40">/</span>
+                  <span>{eyebrow}</span>
+                </>
+              )}
             </p>
-            <h2 className="text-ink text-[28px] leading-[1.15] font-semibold tracking-[-0.028em] sm:text-[36px]">
+            <h2 className="typo-display text-ink text-[30px] leading-[1.12] font-semibold tracking-[-0.032em] sm:text-[38px]">
               {title}
             </h2>
-            <p className="text-ink-3 mt-2.5 text-[15px] leading-relaxed sm:text-[17px]">{desc}</p>
+            <p className="text-ink-3 mt-3 max-w-[54ch] text-[15px] leading-[1.7] text-pretty sm:text-[16.5px]">
+              {desc}
+            </p>
           </div>
           {aside && <div className="shrink-0">{aside}</div>}
         </div>

@@ -43,6 +43,7 @@ export function CurveSection({ index }: { index: number }) {
     <Section
       id="curve"
       index={index}
+      eyebrow="Convergence"
       title="Loss 曲线"
       desc="左图按训练步数（step），右图按已训练 token 数量展示收敛轨迹。"
       aside={
@@ -94,6 +95,7 @@ export function FiguresSection({ index }: { index: number }) {
     <Section
       id="figures"
       index={index}
+      eyebrow="Visualization"
       title="对比图"
       desc="模型规模扩展与多数据源验证集上的实验可视化，点击任意卡片放大浏览。"
       aside={<ChartModeToggle adaptDark={adaptDark} onToggle={() => setAdaptDark((v) => !v)} />}
@@ -141,7 +143,7 @@ export function FiguresSection({ index }: { index: number }) {
                 </div>
                 <div className="flex items-center gap-2.5">
                   <ChartModeToggle adaptDark={adaptDark} onToggle={() => setAdaptDark((v) => !v)} />
-                  <span className="liquid-pill text-ink-2 rounded-full px-3 py-1 font-mono text-[12px] tabular-nums">
+                  <span className="liquid-pill typo-num text-ink-2 rounded-full px-3 py-1 text-[12px] font-medium">
                     {activeIdx + 1} / {figures.length}
                   </span>
                 </div>
@@ -187,7 +189,7 @@ export function ResultsSection({ index }: { index: number }) {
   useEffect(() => { api.results().then(setTables).catch(console.error) }, [])
 
   return (
-    <Section id="results" index={index} title="结果表" desc="实验 A（模型规模对比）与实验 C（字符级 vs BPE 分词）的完整评测数据。">
+    <Section id="results" index={index} eyebrow="Benchmarks" title="结果表" desc="实验 A（模型规模对比）与实验 C（字符级 vs BPE 分词）的完整评测数据。">
       <div className="space-y-6">
         {tables.map((t) => (
           <div key={t.title} onPointerMove={onLiquidMove} className="apple-card overflow-hidden rounded-[22px] p-6 sm:p-7">

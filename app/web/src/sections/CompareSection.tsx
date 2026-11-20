@@ -14,7 +14,7 @@ import { DEFAULT_PARAMS, SamplingPanel } from "@/components/SamplingPanel"
 import { Section } from "@/components/Section"
 import { cn } from "@/lib/utils"
 
-// 单张堆叠卡片内部正文 + 底部统计
+// 单张堆叠卡片内部正文 + 底部统计（超出最大可视高度时同样自动上滑显示新内容，保持堆叠卡片优雅定高）
 function DeckCardBody({
   out,
   queued,
@@ -25,20 +25,38 @@ function DeckCardBody({
   missingCkpt?: string
 }) {
   const [elapsed, setElapsed] = useState(0)
+  const [scrolledTop, setScrolledTop] = useState(false)
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const stickBottom = useRef(true)
   const started = out.running || out.chunks.length > 0 || out.done || out.error
   const waiting = out.running && out.chunks.length === 0
 
   useEffect(() => {
     if (!out.running) return
+    stickBottom.current = true
     const t0 = performance.now()
     setElapsed(0)
     const id = setInterval(() => setElapsed((performance.now() - t0) / 1000), 100)
     return () => clearInterval(id)
   }, [out.running])
 
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el || !stickBottom.current) return
+    el.scrollTop = el.scrollHeight
+    setScrolledTop(el.scrollTop > 4)
+  }, [out.chunks.length, out.done, out.error])
+
+  const handleScroll = () => {
+    const el = scrollRef.current
+    if (!el) return
+    stickBottom.current = el.scrollHeight - el.scrollTop - el.clientHeight <= 28
+    setScrolledTop(el.scrollTop > 4)
+  }
+
   if (!started) {
     return (
-      <div className="text-ink-3 flex min-h-[210px] items-center justify-center text-center text-[14.5px]">
+      <div className="text-ink-3 flex h-[240px] items-center justify-center text-center text-[14.5px]">
         {missingCkpt
           ? `找不到 ${missingCkpt}`
           : queued
@@ -50,27 +68,33 @@ function DeckCardBody({
 
   if (waiting) {
     return (
-      <div className="flex min-h-[210px] items-center justify-center">
+      <div className="flex h-[240px] items-center justify-center">
         <PixelLoader />
       </div>
     )
   }
 
   return (
-    <div className="flex min-h-[210px] flex-col">
-      <p className="text-ink text-[16px] leading-[1.85] tracking-[-0.006em] whitespace-pre-wrap">
-        <span className="bg-mark text-ink mr-0.5 rounded-[6px] px-1.5 py-0.5 font-medium">{out.prompt}</span>
-        {out.chunks.map((c, i) => <span key={i} className="token">{c}</span>)}
-        {(out.running || out.done) && <span className={cn("caret", out.running && "is-streaming")} />}
-      </p>
+    <div className="flex h-[270px] flex-col">
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className={cn("apple-scroll min-h-0 flex-1 overflow-y-auto pr-2", scrolledTop && "scroll-fade-top")}
+      >
+        <p className="typo-editorial text-ink text-[17.5px] leading-[1.9] tracking-[-0.004em] whitespace-pre-wrap">
+          <span className="bg-mark text-ink mr-0.5 rounded-[6px] px-1.5 py-0.5 font-medium italic">{out.prompt}</span>
+          {out.chunks.map((c, i) => <span key={i} className="token">{c}</span>)}
+          {(out.running || out.done) && <span className={cn("caret", out.running && "is-streaming")} />}
+        </p>
 
-      {out.error && (
-        <p className="bg-destructive/10 text-destructive mt-4 rounded-xl px-3.5 py-2 text-[13px]">{out.error}</p>
-      )}
+        {out.error && (
+          <p className="bg-destructive/10 text-destructive mt-4 rounded-xl px-3.5 py-2 text-[13px]">{out.error}</p>
+        )}
+      </div>
 
       {out.running && out.chunks.length > 0 && (
-        <div className="border-line text-ink-3 mt-auto flex items-center gap-3 border-t pt-4 font-mono text-[12px] tabular-nums">
-          <span className="text-brand font-sans font-medium">正在生成</span>
+        <div className="border-line typo-num text-ink-3 mt-4 flex shrink-0 items-center gap-3 border-t pt-4 text-[12.5px]">
+          <span className="text-brand font-medium">正在生成</span>
           <span>{out.chunks.length} 段</span>
           <span>{elapsed.toFixed(1)}s</span>
         </div>
@@ -78,11 +102,11 @@ function DeckCardBody({
 
       {out.done && (
         <div
-          className="border-line text-ink-3 mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 border-t pt-4 font-mono text-[12px] tabular-nums"
+          className="border-line typo-num text-ink-3 mt-4 flex shrink-0 flex-wrap items-center gap-x-4 gap-y-1 border-t pt-4 text-[12.5px]"
           style={{ animation: "token-in 260ms ease-out both" }}
         >
-          <span>seed {out.done.seed}</span>
-          <span>{out.done.n_tokens} tok</span>
+          <span>Seed {out.done.seed}</span>
+          <span>{out.done.n_tokens} tokens</span>
           <span>{out.done.seconds.toFixed(2)}s</span>
           <span className="text-ink ml-auto font-semibold">{out.done.tok_s.toFixed(0)} tok/s</span>
         </div>
@@ -158,7 +182,7 @@ export function CompareSection({ index, examples }: { index: number; examples: s
     } catch { /* 无剪贴板权限时忽略 */ }
   }
 
-  const summary = `T ${params.temperature} · k ${params.top_k || "∞"} · p ${params.top_p} · ${params.max_new_tokens} tok · seed ${params.seed}`
+  const summary = `Temperature ${params.temperature} · Top-k ${params.top_k || "不限"} · Top-p ${params.top_p >= 1 ? "不限" : params.top_p} · ${params.max_new_tokens} tok · Seed ${params.seed}`
 
   const speedRows = models
     .map((m, i) => ({ idx: i, run: m.run, tok_s: outs[i]?.done?.tok_s ?? 0, seconds: outs[i]?.done?.seconds ?? 0 }))
@@ -179,7 +203,7 @@ export function CompareSection({ index, examples }: { index: number; examples: s
   const backCardHeight = Math.max(220, frontHeight - 24)
 
   return (
-    <Section id="compare" index={index} title="三模型对比" desc="同一开头、同一组采样参数、同一随机种子。点击露出的卡片顶部或上方选择器，丝滑翻阅不同规模模型的续写。">
+    <Section id="compare" index={index} eyebrow="Comparison" title="三模型对比" desc="同一开头、同一组采样参数、同一随机种子。点击露出的卡片顶部或上方选择器，丝滑翻阅不同规模模型的续写。">
       <div className="space-y-6">
         <Composer
           value={prompt}
@@ -200,7 +224,7 @@ export function CompareSection({ index, examples }: { index: number; examples: s
           >
             <SlidersHorizontal className="size-3.5 text-brand" />
             <span className="font-medium">采样参数</span>
-            <span className="text-ink-3 truncate font-mono text-[12px]">{summary}</span>
+            <span className="typo-num text-ink-3 truncate text-[12.5px]">{summary}</span>
             <ChevronDown className={cn("ml-auto size-4 transition-transform duration-300", showParams && "rotate-180")} />
           </button>
           <div
@@ -235,7 +259,7 @@ export function CompareSection({ index, examples }: { index: number; examples: s
                   >
                     <span className={cn("size-2 rounded-full", badge.dot, out.running && "animate-pulse")} />
                     <span>{m.run}</span>
-                    <span className="text-ink-3 font-mono text-[11px] font-normal">
+                    <span className="typo-num text-ink-3 text-[11.5px] font-normal">
                       {out.done ? `${out.done.tok_s.toFixed(0)} tok/s` : badge.tag}
                     </span>
                   </button>
@@ -338,7 +362,7 @@ export function CompareSection({ index, examples }: { index: number; examples: s
                       <div className="flex items-center gap-3">
                         <span className={cn("size-2.5 rounded-full", badge.dot, out.running && "animate-pulse")} />
                         <span className="text-ink text-[18px] font-semibold tracking-[-0.02em]">{m.run}</span>
-                        <span className="text-ink-3 font-mono text-[12.5px] tabular-nums">
+                        <span className="typo-num text-ink-3 text-[13px]">
                           {m.params ? `${fmtM(m.params)} · ${badge.tag}` : "权重缺失"}
                         </span>
                       </div>
@@ -347,7 +371,7 @@ export function CompareSection({ index, examples }: { index: number; examples: s
                         {out.running && <span className="text-brand text-[12.5px] font-medium">正在生成…</span>}
                         {isQueued && <span className="text-ink-3 text-[12.5px]">排队中</span>}
                         {out.done && !out.running && (
-                          <span className="text-ink-2 font-mono text-[12.5px] font-medium tabular-nums">
+                          <span className="typo-num text-ink-2 text-[13px] font-medium">
                             {out.done.tok_s.toFixed(0)} tok/s · {out.done.seconds.toFixed(2)}s
                           </span>
                         )}
@@ -416,7 +440,7 @@ export function CompareSection({ index, examples }: { index: number; examples: s
                         <span className={cn("size-2 rounded-full", badge.dot)} />
                         {r.run}
                       </span>
-                      <span className="text-ink-2 font-mono text-[12.5px] tabular-nums">
+                      <span className="typo-num text-ink-2 text-[13px]">
                         <strong className="text-ink font-semibold">{r.tok_s.toFixed(0)} tok/s</strong> · {r.seconds.toFixed(2)}s
                       </span>
                     </div>
